@@ -1,0 +1,47 @@
+Project viral_cast_ai {
+  database_type: "PostgreSQL"
+}
+
+Table province {
+  uuid uuid [pk]
+  code varchar(20) [not null, unique]
+  name varchar(100) [not null]
+  deleted_at bigint [default: 0]
+}
+
+Table regency {
+  uuid uuid [pk]
+  code varchar(20) [not null, unique]
+  name varchar(100) [not null]
+  province_uuid uuid [not null]
+  deleted_at bigint [default: 0]
+  indexes {
+    (province_uuid) [name: 'regency_province_idx']
+  }
+}
+
+Table district {
+  uuid uuid [pk]
+  code varchar(20) [not null, unique]
+  name varchar(100) [not null]
+  regency_uuid uuid [not null]
+  deleted_at bigint [default: 0]
+  indexes {
+    (regency_uuid) [name: 'district_regency_idx']
+  }
+}
+
+Table village {
+  uuid uuid [pk]
+  code varchar(20) [not null, unique]
+  name varchar(100) [not null]
+  district_uuid uuid [not null]
+  deleted_at bigint [default: 0]
+  indexes {
+    (district_uuid) [name: 'village_district_idx']
+  }
+}
+
+Ref: regency.province_uuid > province.uuid
+Ref: district.regency_uuid > regency.uuid
+Ref: village.district_uuid > district.uuid

@@ -1,0 +1,103 @@
+<script lang="ts">
+	import '../app.css';
+	import type { Snippet } from 'svelte';
+	import Sidebar from '$lib/components/Sidebar.svelte';
+	import Header from '$lib/components/Header.svelte';
+	import ShoppingCart from '$lib/components/ShoppingCart.svelte';
+	import { browser } from '$app/environment';
+	import { initTheme } from '$lib/theme';
+	import { onMount } from 'svelte';
+	import { page } from '$app/state';
+
+	let { children }: { children: Snippet } = $props();
+
+	// state layout
+	let collapsed = $state(false);
+	let mobileOpen = $state(false);
+
+	// hamburger: desktop -> collapse, mobile -> drawer
+	function onHamburger(isDesktop: boolean) {
+		if (isDesktop) collapsed = !collapsed;
+		else mobileOpen = !mobileOpen;
+	}
+
+	// theme init
+	$effect(() => initTheme());
+
+	// close drawer saat naik ke md
+	type MQLite = {
+		matches: boolean;
+		addEventListener: (type: 'change', listener: () => void) => void;
+		removeEventListener: (type: 'change', listener: () => void) => void;
+	};
+
+	onMount(() => {
+		if (!browser) return;
+		const mql = (globalThis as any).matchMedia?.('(min-width: 768px)') as MQLite | undefined;
+		if (!mql) return;
+		const onChange = () => {
+			if (mql.matches) mobileOpen = false;
+		};
+		mql.addEventListener('change', onChange);
+		return () => mql.removeEventListener('change', onChange);
+	});
+
+	// ---- auth mode: rute /auth/* full-screen, tanpa sidebar/header
+	const isAuthRoute = $derived.by(() => page.url.pathname.startsWith('/login'));
+	const isPagesRoute = $derived.by(() => page.url.pathname.startsWith('/pages'));
+
+	// ---- header user data from layout server (profile + user)
+	// Menampilkan nama lengkap (First Name + Last Name) dari profil
+	const headerName = $derived.by(() => {
+		const firstName = page.data?.profile?.first_name ?? '';
+		const lastName = page.data?.profile?.last_name ?? '';
+		if (firstName || lastName) {
+			return `${firstName} ${lastName}`.trim();
+		}
+		return page.data?.profile?.name ?? page.data?.user?.name ?? 'Admin';
+	});
+	// Menggunakan username dari API sebagai pengganti email
+	const headerEmail = $derived.by(() => page.data?.user?.username ?? 'viralcastai@gmail.com');
+	const headerAvatar = $derived.by(() => page.data?.profile?.photo_profile ?? '/images/user.png');
+</script>
+
+{#if isAuthRoute || isPagesRoute}
+	<!-- Full-bleed auth pages (login/register/forgot/reset/logout) -->
+	<main class="min-h-screen">
+		{@render children()}
+	</main>
+{:else}
+	<!-- App shell (sidebar + header) -->
+    <div
+        class="flex min-h-screen flex-col overflow-hidden md:grid md:grid-cols-[var(--sidebar-w)_1fr] md:grid-rows-[var(--header-h)_1fr]"
+        style={`--header-h:64px; --sidebar-w:${collapsed ? '3.75rem' : '16rem'}`}
+    >
+		<!-- Mobile Header -->
+		<div class="md:hidden">
+			<Header {onHamburger} name={headerName} email={headerEmail} avatarUrl={headerAvatar} />
+		</div>
+
+		<!-- Sidebar (span 2 rows on desktop) -->
+		<Sidebar
+			class="md:col-start-1 md:row-span-2 md:row-start-1"
+			{collapsed}
+			open={mobileOpen}
+			onClose={() => (mobileOpen = false)}
+		/>
+
+		<!-- Desktop Header -->
+		<div class="hidden md:col-start-2 md:row-start-1 md:block">
+			<Header {onHamburger} name={headerName} email={headerEmail} avatarUrl={headerAvatar} />
+		</div>
+
+		<!-- Main -->
+		<main class="flex-1 overflow-y-auto p-0 md:col-start-2 md:row-start-2">
+			<div class="flex h-full flex-col overflow-hidden">
+				{@render children()}
+			</div>
+		</main>
+	</div>
+
+	<!-- Shopping Cart Component -->
+	<ShoppingCart />
+{/if}

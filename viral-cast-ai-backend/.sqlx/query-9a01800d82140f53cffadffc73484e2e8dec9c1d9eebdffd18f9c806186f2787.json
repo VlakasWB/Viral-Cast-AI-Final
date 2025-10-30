@@ -1,0 +1,20 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO ingredient_stock_moves (\n                uuid,\n                ingredient_catalog_uuid,\n                quantity,\n                price,\n                price_updated_at,\n                effective_at,\n                expiry_at,\n                ref_type,\n                ref_uuid,\n                name,\n                created_at,\n                updated_at,\n                deleted_at\n            )\n            VALUES ($1, $2, $3, $4, $5, $5, NULL, 'PRODUCTION', $6, $7, $5, $5, 0)\n            ON CONFLICT (uuid) DO UPDATE SET name = EXCLUDED.name, updated_at = EXCLUDED.updated_at",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Numeric",
+        "Numeric",
+        "Int8",
+        "Uuid",
+        "Varchar"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "9a01800d82140f53cffadffc73484e2e8dec9c1d9eebdffd18f9c806186f2787"
+}

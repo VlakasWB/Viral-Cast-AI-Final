@@ -1,0 +1,93 @@
+/* ===== Global theming + background (FULL) ===== */
+
+/* Reset ringan */
+*,
+::before,
+::after {
+	box-sizing: border-box;
+}
+html,
+body,
+#svelte {
+	height: 100%;
+}
+body {
+	margin: 0;
+	min-height: 100dvh;
+}
+
+/* ---------- Tokens default (light) ---------- */
+:root {
+	--surface: #fff8f3;
+	--surface-2: #fff2e8;
+	--text: #4b2b10;
+	--text: #000000; /* teks hitam penuh untuk light mode */
+
+	/* border netral di light */
+	--line: rgba(0, 0, 0, 0.15);
+
+	/* brand default (netral) */
+	--brand-500: #333333;
+	--brand-300: #999999;
+
+	--bg-base: #fff8f3;
+	--bg-from: #fff8f3;
+	--bg-to: #f5f5f5;
+
+	--app-bg: var(--bg-base);
+
+	--shadow-strong: 0 30px 80px rgba(0, 0, 0, 0.12), 0 12px 30px rgba(0, 0, 0, 0.08);
+
+	--active-bg: rgba(0, 0, 0, 0.1);
+	--active-fg: #333333;
+}
+
+/* ---------- Dark overrides ---------- */
+html[data-mode='dark'] {
+	--surface: #2a1506;
+	--surface-2: #1f1004;
+	--text: #fff2e8;
+
+	/* border netral di dark */
+	--line: rgba(255, 255, 255, 0.15);
+
+	--bg-base: #1a0d04;
+	--shadow-strong: 0 40px 100px rgba(0, 0, 0, 0.25), 0 16px 40px rgba(0, 0, 0, 0.15);
+
+	--active-bg: rgba(255, 255, 255, 0.1);
+	--active-fg: #ffffff;
+}
+
+/* [REMOVED] Semua varian berbasis data-theme (rose, ocean, emerald, grape, slate) dihapus sesuai permintaan. */
+
+/* ---------- Apply global ---------- */
+@layer base {
+	body {
+		background: var(--app-bg);
+		background-attachment: fixed; /* cover viewport saat scroll */
+		color: var(--text);
+	}
+}
+
+/* ---------- Util untuk komponen ---------- */
+.surface {
+	background-color: color-mix(in oklab, var(--surface) 92%, transparent);
+	backdrop-filter: blur(6px);
+}
+.surface-2 {
+	background-color: color-mix(in oklab, var(--surface-2) 92%, transparent);
+	backdrop-filter: blur(6px);
+}
+
+.border-line {
+	border-color: var(--line);
+}
+.elevated-strong {
+	box-shadow: var(--shadow-strong);
+}
+
+/* state aktif nav */
+.nav-active {
+	background-color: var(--active-bg);
+	color: var(--active-fg);
+}

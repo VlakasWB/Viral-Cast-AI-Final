@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  viral-cast-ai-frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: viral-cast-ai-frontend
+    ports:
+      - '5544:5544'
+    environment:
+      - NODE_ENV=production
+      - PORT=5544
+      - HOST=0.0.0.0
+      - API_BASE_URL=http://localhost:12000
+      - FRONTEND_URL=http://localhost:5544
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    read_only: false
+    tmpfs:
+      - /tmp:noexec,nosuid,size=100m
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "require('http').get('http://localhost:5544', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - viral-cast-network
+    labels:
+      - 'io.containers.autoupdate=registry'
+      - 'app=viral-cast-ai-frontend'
+      - 'version=1.0.0'
+
+networks:
+  viral-cast-network:
+    driver: bridge

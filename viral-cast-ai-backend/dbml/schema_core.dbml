@@ -1,0 +1,395 @@
+Project viral_cast_ai {
+  database_type: "PostgreSQL"
+}
+
+Table users {
+  uuid uuid [pk]
+  username varchar(100) [not null, unique]
+  email varchar(255) [unique]
+  password varchar(100) [not null]
+  access_token text
+  refresh_token text
+  created_at bigint
+  updated_at bigint
+  deleted_at bigint [default: 0]
+  Note: 'created_at/updated_at default epoch ms now (server-side)'
+}
+
+Table roles {
+  uuid uuid [pk]
+  number int [unique] // SERIAL in DB
+  name varchar(100)
+  created_at bigint
+  updated_at bigint
+  deleted_at bigint [default: 0]
+  Note: 'number is SERIAL UNIQUE'
+}
+
+Table profiles {
+  uuid uuid [pk]
+  user_uuid uuid
+  first_name varchar(255)
+  last_name varchar(255)
+  photo_profile varchar(255)
+  background_profile varchar(255)
+  gender varchar(25)
+  telp varchar(25)
+  birth_date varchar(50)
+  birth_place varchar(255)
+  roles_number int [default: 6]
+  store_uuid uuid
+  website varchar(255)
+  instagram varchar(255)
+  whatsapp varchar(50)
+  province_code varchar(20)
+  regency_code varchar(20)
+  district_code varchar(20)
+  village_code varchar(20)
+  rt varchar(3)
+  rw varchar(3)
+  postal_code varchar(10)
+  created_at bigint
+  updated_at bigint
+  deleted_at bigint [default: 0]
+  indexes {
+    (user_uuid) [name: 'profiles_user_uuid_uniq', unique]
+    (province_code) [name: 'profiles_province_code_idx']
+    (regency_code) [name: 'profiles_regency_code_idx']
+    (district_code) [name: 'profiles_district_code_idx']
+    (village_code) [name: 'profiles_village_code_idx']
+    (store_uuid) [name: 'profiles_store_uuid_idx']
+    (rt) [name: 'profiles_rt_idx']
+    (rw) [name: 'profiles_rw_idx']
+    (postal_code) [name: 'profiles_postal_code_idx']
+  }
+  Note: 'CHECK (roles_number >= 0); trigger profiles_default_roles_number_before_insert sets default 6 when NULL'
+}
+
+Table categories {
+  uuid uuid [pk]
+  name varchar(50) [not null]
+  created_at bigint
+  updated_at bigint
+  deleted_at bigint [default: 0]
+  indexes {
+    (name) [name: 'uniq_categories_name_not_deleted', unique, note: 'WHERE deleted_at = 0']
+  }
+}
+
+Table units_of_measure {
+  uuid uuid [pk]
+  code varchar(10) [not null, unique]
+  name varchar(50) [not null]
+  created_at bigint
+  updated_at bigint
+  deleted_at bigint [default: 0]
+}
+
+
+Table unit_of_measure_conversions {
+  uuid uuid [pk]
+  from_unit_of_measure uuid [not null]
+  to_unit_of_measure uuid [not null]
+  multiplier numeric(18,6) [not null]
+  created_at bigint
+  updated_at bigint
+  deleted_at bigint [default: 0]
+  indexes {
+    (from_unit_of_measure, to_unit_of_measure) [name: 'unit_of_measure_conversions_uniq', unique]
+  }
+}
+
+Table ingredient_catalog {
+  uuid uuid [pk]
+  name varchar(100) [not null, unique]
+  unit_of_measure_uuid uuid [not null]
+  minimum_stock numeric(12,3)
+  price numeric(12,4)
+  effective_at bigint
+  shelf_life_days int
+  created_at bigint
+  updated_at bigint
+  deleted_at bigint [default: 0]
+}
+
+Table ingredient_stocks {
+  uuid uuid [pk]
+  name varchar(100)
+  ingredient_stock_moves_uuid uuid [not null, ref: > ingredient_stock_moves.uuid]
+  total_quantity numeric(12,4) [not null, default: 0]
+  total_value numeric(14,4) [not null, default: 0]
+  current_cost numeric(12,4)
+  avg_cost numeric(12,4)
+  created_at bigint [not null]
+  updated_at bigint [not null]
+  deleted_at bigint [not null, default: 0]
+  indexes {
+    (ingredient_stock_moves_uuid) [name: 'ingredient_stocks_ingredient_stock_moves_uuid_idx']
+  }
+}
+
+Table ingredient_stock_moves {
+  uuid uuid [pk]
+  name varchar(100)
+  ingredient_catalog_uuid uuid [not null]
+  quantity numeric(12,4) [not null]
+  price numeric(12,4)
+  price_updated_at bigint
+  effective_at bigint [not null]   
+  expiry_at bigint                 
+  ref_type varchar(30)             -- 'PURCHASE' | 'PRODUCTION' | 'ADJUSTMENT' | 'WASTE' | 'RETURN'
+  ref_uuid uuid
+  created_at bigint
+  updated_at bigint
+  deleted_at bigint [default: 0]
+  indexes {
+    (ingredient_catalog_uuid) [name: 'idx_ingredient_stock_moves_ingredient_catalog_uuid']
+    (effective_at) [name: 'idx_ingredient_stock_moves_effective_at']
+    (expiry_at) [name: 'idx_ingredient_stock_moves_expiry_at']
+    (ref_type) [name: 'idx_ingredient_stock_moves_ref_type']
+    (deleted_at) [name: 'idx_ingredient_stock_moves_deleted_at']
+  }
+}
+
+Table ingredient_market_prices {
+  uuid uuid [pk]
+  name varchar(100)
+  ingredient_catalog_uuid uuid [not null]
+  price numeric(12,4)
+  effective_at bigint [not null]
+  created_at bigint
+  updated_at bigint
+  deleted_at bigint [default: 0]
+  indexes {
+    (ingredient_catalog_uuid) [name: 'idx_ingredient_market_prices_ingredient_catalog_uuid']
+    (effective_at) [name: 'idx_ingredient_market_prices_effective_at']
+  }
+}
+
+Table recipe_sets {
+  uuid uuid [pk]
+  name varchar(100) [not null]
+  yield_quantity numeric(10,2) [not null]
+  effective_from bigint
+  effective_to bigint
+  is_active boolean [not null, default: true]
+  created_at bigint
+  updated_at bigint
+  deleted_at bigint [default: 0]
+  Note: 'CHECK (yield_quantity > 0); CHECK (effective_to IS NULL OR effective_from IS NULL OR effective_to >= effective_from)'
+}
+
+Table recipe_items {
+  uuid uuid [pk]
+  recipe_sets_uuid uuid [not null]
+  ingredient_stocks_uuid uuid [not null]
+  quantity numeric(10,2) [not null]
+  waste_percent numeric(5,4) [default: 0]
+  created_at bigint
+  updated_at bigint
+  deleted_at bigint [default: 0]
+  indexes {
+    (recipe_sets_uuid, ingredient_stocks_uuid) [name: 'recipe_items_unique_active', unique, note: 'WHERE deleted_at = 0']
+    (ingredient_stocks_uuid) [name: 'recipe_items_ingredient_stocks_idx']
+  }
+  Note: 'CHECK (quantity > 0); CHECK (waste_percent >= 0 AND waste_percent <= 1)'
+}
+
+Table products {
+  uuid uuid [pk]
+  category_uuid uuid [not null]
+  name varchar(100) [not null]
+  sku varchar(50)
+  price numeric(12,2) [not null]
+  recipe_sets_uuid uuid
+  status varchar(20) [not null, default: 'ACTIVE']
+  image_url varchar(255)
+  created_at bigint
+  updated_at bigint
+  deleted_at bigint [default: 0]
+  indexes {
+    (category_uuid) [name: 'products_category_idx']
+    (sku) [name: 'products_sku_active_uniq', unique, note: 'Index on lower(sku) WHERE deleted_at = 0']
+  }
+  Note: "CHECK (status IN ('ACTIVE','INACTIVE'))"
+}
+Table orders {
+  uuid uuid [pk]
+  order_no varchar(30) [not null, unique]
+  cashier_uuid uuid
+  status varchar(20) [not null, default: 'PAID']
+  subtotal numeric(12,2) [not null, default: 0]
+  discount numeric(12,2) [not null, default: 0]
+  tax numeric(12,2) [not null, default: 0]
+  total numeric(12,2) [not null, default: 0]
+  net_profit numeric(12,2)
+  created_at bigint
+  updated_at bigint
+  deleted_at bigint [default: 0]
+  indexes {
+    (created_at) [name: 'orders_created_idx']
+    (status) [name: 'orders_status_idx']
+  }
+  Note: "CHECK (status IN ('DRAFT','PAID','CANCELLED','REFUNDED'))"
+}
+
+Table order_items {
+  uuid uuid [pk]
+  order_uuid uuid [not null]
+  product_uuid uuid [not null]
+  qty numeric(12,4) [not null]
+  unit_price numeric(12,2) [not null]
+  unit_cost numeric(12,2)
+  line_total numeric(12,2) [not null]
+  created_at bigint
+  updated_at bigint
+  deleted_at bigint [default: 0]
+  indexes {
+    (product_uuid, created_at) [name: 'order_items_prod_created_idx']
+    (order_uuid) [name: 'order_items_order_idx']
+  }
+  Note: 'CHECK (qty > 0)'
+}
+
+Table payments {
+  uuid uuid [pk]
+  order_uuid uuid [not null]
+  method varchar(20) [not null]
+  amount numeric(12,2) [not null]
+  paid_at bigint
+  external_ref varchar(100)
+  created_at bigint
+  updated_at bigint
+  deleted_at bigint [default: 0]
+  indexes {
+    (order_uuid) [name: 'payments_order_idx']
+  }
+  Note: "CHECK (method IN ('CASH','CARD','QRIS','TRANSFER')); CHECK (amount >= 0)"
+}
+
+Table forecast_daily {
+  uuid uuid [pk]
+  product_uuid uuid [not null]
+  date_ts bigint [not null]
+  method varchar(32) [not null]
+  window_size int
+  params json
+  forecast_qty numeric(12,4) [not null]
+  conf_low numeric(12,4)
+  conf_high numeric(12,4)
+  mae numeric(12,4)
+  mape numeric(12,4)
+  created_at bigint
+  updated_at bigint
+  deleted_at bigint [default: 0]
+  Note: "CHECK (method IN ('SMA','WMA','EMA','LINEAR_REGRESSION','MULTIVARIATE_REGRESSION')); CHECK (window_size IS NULL OR window_size > 0)"
+}
+
+Table stores {
+  uuid uuid [pk]
+  name varchar(100) [not null]
+  brand_url varchar(255)
+  province_code varchar(20)
+  regency_code varchar(20)
+  district_code varchar(20)
+  village_code varchar(20)
+  rt varchar(3)
+  rw varchar(3)
+  telp varchar(25)
+  whatsapp varchar(50)
+  instagram varchar(255)
+  postal_code varchar(10)
+  created_at bigint
+  updated_at bigint
+  deleted_at bigint [default: 0]
+  indexes {
+    (province_code) [name: 'stores_province_code_idx']
+    (regency_code) [name: 'stores_regency_code_idx']
+    (district_code) [name: 'stores_district_code_idx']
+    (village_code) [name: 'stores_village_code_idx']
+    (postal_code) [name: 'stores_postal_code_idx']
+  }
+}
+
+// Relationships
+Ref: profiles.user_uuid > users.uuid
+Ref: profiles.roles_number > roles.number
+Ref: profiles.store_uuid > stores.uuid
+
+Ref: ingredient_catalog.unit_of_measure_uuid > units_of_measure.uuid
+Ref: ingredient_stocks.ingredient_catalog_uuid > ingredient_catalog.uuid
+Ref: ingredient_stock_moves.ingredient_catalog_uuid > ingredient_catalog.uuid
+Ref: ingredient_market_prices.ingredient_catalog_uuid > ingredient_catalog.uuid
+Ref: products.category_uuid > categories.uuid
+Ref: products.recipe_sets_uuid > recipe_sets.uuid
+Ref: recipe_items.recipe_sets_uuid > recipe_sets.uuid
+Ref: recipe_items.ingredient_stocks_uuid > ingredient_stocks.uuid
+
+Ref: order_items.order_uuid > orders.uuid
+Ref: order_items.product_uuid > products.uuid
+Ref: payments.order_uuid > orders.uuid
+
+// Cross-file references to Regions (load schema_regions.dbml together)
+Ref: stores.province_code > province.code
+Ref: stores.regency_code  > regency.code
+Ref: stores.district_code > district.code
+Ref: stores.village_code  > village.code
+Ref: profiles.province_code > province.code
+Ref: profiles.regency_code  > regency.code
+Ref: profiles.district_code > district.code
+Ref: profiles.village_code  > village.code
+
+Table order_history {
+  uuid uuid [pk]
+  order_uuid uuid [not null]
+  event_type varchar(30) [not null] // CREATED, STATUS_CHANGED, ITEM_ADDED, PAYMENT_ADDED, etc.
+  previous_status varchar(20)
+  new_status varchar(20)
+  change_details json // arbitrary detail payload (fields changed, amounts, etc.)
+  changed_by uuid
+  changed_at bigint
+  created_at bigint
+  updated_at bigint
+  deleted_at bigint [default: 0]
+  indexes {
+    (order_uuid, changed_at) [name: 'order_history_order_changed_idx']
+    (event_type) [name: 'order_history_event_type_idx']
+  }
+  Note: "Event types seperti: CREATED, STATUS_CHANGED, ITEM_ADDED/UPDATED/REMOVED, PAYMENT_ADDED/UPDATED/REMOVED, CANCELLED, REFUNDED"
+}
+
+Table sales_summary_daily {
+  uuid uuid [pk]
+  product_uuid uuid [not null]
+  date_ts bigint [not null]
+  qty numeric(12,4) [not null, default: 0]
+  revenue numeric(12,2) [not null, default: 0]
+  cost numeric(12,2) [not null, default: 0]
+  net_profit numeric(12,2) [default: 0]
+  created_at bigint
+  updated_at bigint
+  deleted_at bigint [default: 0]
+  indexes {
+    (product_uuid, date_ts) [name: 'sales_summary_daily_unique_active', unique, note: 'WHERE deleted_at = 0']
+    (date_ts) [name: 'sales_summary_daily_date_idx']
+  }
+  Note: 'Agregat harian per produk: qty, revenue, cost, net_profit'
+}
+
+// Relationships tambahan
+Ref: order_history.order_uuid > orders.uuid
+Ref: order_history.changed_by > users.uuid
+Ref: sales_summary_daily.product_uuid > products.uuid
+Ref: order_items.order_uuid > orders.uuid
+Ref: order_items.product_uuid > products.uuid
+Ref: payments.order_uuid > orders.uuid
+
+// Cross-file references to Regions (load schema_regions.dbml together)
+Ref: stores.province_code > province.code
+Ref: stores.regency_code  > regency.code
+Ref: stores.district_code > district.code
+Ref: stores.village_code  > village.code
+Ref: profiles.province_code > province.code
+Ref: profiles.regency_code  > regency.code
+Ref: profiles.district_code > district.code
+Ref: profiles.village_code  > village.code

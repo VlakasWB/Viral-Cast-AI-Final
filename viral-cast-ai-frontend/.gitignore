@@ -1,0 +1,59 @@
+test-results
+node_modules
+.vscode
+
+# Output
+.output
+.vercel
+.netlify
+.wrangler
+/.svelte-kit
+/build
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env
+.env
+.env.*
+!.env.example
+!.env.test
+
+# Vite
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*
+
+# Paraglide
+src/lib/paraglide
+
+*storybook.log
+storybook-static
+
+# Coverage
+/coverage
+coverage/
+.coverage
+*.lcov
+.nyc_output
+coverage.json
+coverage-final.json
+*.coverage
+.coverage.*
+coverage.xml
+coverage.info
+lcov.info
+clover.xml
+cobertura.xml
+jacoco.xml
+junit.xml
+test-results.xml
+coverage-summary.json
+.c8_output
+c8-coverage/
+.vitest-coverage/
+vitest-coverage/
+jest-coverage/
+.jest-coverage/
+*.tgz
+*.tar.gz

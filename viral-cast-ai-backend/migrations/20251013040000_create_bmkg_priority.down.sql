@@ -1,0 +1,1 @@
+DROP TABLE IF EXISTS bmkg_area_priority;

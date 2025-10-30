@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        UPDATE ingredient_market_prices\n        SET deleted_at = $1\n        WHERE uuid = $2 AND deleted_at = 0\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "911a34e8657fee0dc4fb6bd9e9efbcde485f8d1131787defc3b5ff6da09571b6"
+}

@@ -1,0 +1,40 @@
+name: CI/CD
+
+on:
+  push:
+    branches:
+      - development
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Configure SSH Key
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan github.com >> ~/.ssh/known_hosts
+
+      - name: Set up Git
+        run: |
+          git config --global user.email "vlakasofficial@gmail.com"
+          git config --global user.name "vlakaswb"
+          git remote set-url origin git@github.com:viral-cast-ai/viral-cast-ai-be-rust.git
+
+      - name: Fetch staging branch
+        run: git fetch origin staging
+
+      - name: Checkout staging branch
+        run: git checkout staging
+
+      - name: Merge to staging with 'theirs' strategy
+        run: |
+          git merge --no-ff --no-edit --allow-unrelated-histories -X theirs development
+          git push origin staging

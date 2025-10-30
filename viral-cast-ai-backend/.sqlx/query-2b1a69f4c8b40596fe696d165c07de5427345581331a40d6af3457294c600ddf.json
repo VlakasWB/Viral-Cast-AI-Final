@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            UPDATE ingredient_stocks\n            SET deleted_at = $2\n            WHERE ingredient_stock_moves_uuid IN (\n                SELECT uuid FROM ingredient_stock_moves\n                WHERE ingredient_catalog_uuid = $1\n            )\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "2b1a69f4c8b40596fe696d165c07de5427345581331a40d6af3457294c600ddf"
+}

@@ -1,0 +1,31 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT \n                (EXTRACT(EPOCH FROM to_timestamp(oi.created_at / 1000)::date)::bigint * 1000) AS \"date_ts!: i64\",\n                COALESCE(SUM(oi.qty), 0)::numeric AS \"qty!: Decimal\"\n            FROM order_items oi\n            JOIN orders o ON oi.order_uuid = o.uuid\n            WHERE oi.product_uuid = $1 \n              AND oi.created_at BETWEEN $2 AND $3\n              AND oi.deleted_at = 0\n              AND o.deleted_at = 0\n              AND o.status = 'PAID'\n            GROUP BY to_timestamp(oi.created_at / 1000)::date\n            ORDER BY 1 DESC\n            LIMIT $4\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "date_ts!: i64",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "qty!: Decimal",
+        "type_info": "Numeric"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Int8",
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      null,
+      null
+    ]
+  },
+  "hash": "e4ffcfbef4b588219915cb2a333a9e413a37a28d4455ebb20d8b9e4e8c374a22"
+}

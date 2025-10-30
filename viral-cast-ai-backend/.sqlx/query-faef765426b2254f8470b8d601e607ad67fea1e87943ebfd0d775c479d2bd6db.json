@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                INSERT INTO ingredient_stocks (\n                    uuid,\n                    ingredient_stock_moves_uuid,\n                    total_quantity,\n                    total_value,\n                    current_cost,\n                    avg_cost,\n                    unit_of_measure_code,\n                    unit_of_measure_name,\n                    created_at,\n                    updated_at,\n                    deleted_at\n                )\n                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $9, 0)\n                ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Numeric",
+        "Numeric",
+        "Numeric",
+        "Numeric",
+        "Varchar",
+        "Varchar",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "faef765426b2254f8470b8d601e607ad67fea1e87943ebfd0d775c479d2bd6db"
+}

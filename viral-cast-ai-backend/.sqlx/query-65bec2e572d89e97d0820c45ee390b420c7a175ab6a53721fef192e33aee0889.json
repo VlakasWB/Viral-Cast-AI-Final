@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT s.uuid\n            FROM ingredient_stocks s\n            JOIN ingredient_stock_moves m ON s.ingredient_stock_moves_uuid = m.uuid\n            WHERE m.ingredient_catalog_uuid = $1\n              AND s.deleted_at = 0\n            ORDER BY s.updated_at DESC\n            LIMIT 1\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "uuid",
+        "type_info": "Uuid"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "65bec2e572d89e97d0820c45ee390b420c7a175ab6a53721fef192e33aee0889"
+}

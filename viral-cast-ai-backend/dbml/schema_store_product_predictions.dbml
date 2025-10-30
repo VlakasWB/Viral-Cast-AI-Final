@@ -1,0 +1,40 @@
+Project "store_product_predictions" {
+  note: '''
+  DBML schema khusus untuk tabel store_product_predictions
+  yang menyimpan hasil prediksi permintaan produk per store dan produk,
+  berdasarkan data cuaca BMKG dan analisis Groq LLM.
+  '''
+}
+
+Table store_product_predictions {
+  uuid uuid [pk, default: `gen_uuid_v7()`]
+  store_uuid uuid [not null, ref: > stores.uuid]
+  product_uuid uuid [not null, ref: > products.uuid]
+  region_code text
+  demand_label varchar(32) [not null]
+  demand_probability real
+  recommended_stock_qty numeric(12,2) [not null, default: 0]
+  weather_summary text
+  weather_temp_min_c real
+  weather_temp_max_c real
+  weather_precip_mm real
+  weather_humidity real
+  llm_reasoning text
+  llm_model varchar(128)
+  llm_prompt jsonb
+  llm_response jsonb
+  created_at bigint [not null, note: 'Epoch ms']
+  updated_at bigint [not null, note: 'Epoch ms']
+  deleted_at bigint [not null, default: 0, note: 'Soft delete epoch ms']
+
+  Note: '''
+  Satu record merepresentasikan rekomendasi stok terbaru untuk product tertentu
+  pada sebuah store, selalu diperbarui ketika prediksi baru dihitung.
+  '''
+}
+
+Indexes {
+  (store_uuid, product_uuid) [name: "store_product_predictions_unique_per_product", unique]
+  (store_uuid) [name: "idx_store_product_predictions_store", where: "deleted_at = 0"]
+  (product_uuid) [name: "idx_store_product_predictions_product", where: "deleted_at = 0"]
+}

@@ -1,0 +1,99 @@
+{
+  "tech_stack": [
+    "TypeScript",
+    "SvelteKit",
+    "Vite",
+    "Node.js 20",
+    "pnpm",
+    "Playwright"
+  ],
+  "features": [
+    {
+      "name": "Authentication",
+      "description": "Full-screen auth route for login/logout with backend API validation and token-based session.",
+      "files": [
+        "src/hooks.server.ts",
+        "src/hooks.client.ts",
+        "src/hooks.ts",
+        "src/routes/+layout.svelte",
+        "src/lib/components/auth/ResetPasswordForm.svelte"
+      ]
+    },
+    {
+      "name": "Layout & Shell",
+      "description": "App shell with responsive sidebar, header, and main content area; full-bleed layout for auth routes.",
+      "files": [
+        "src/routes/+layout.svelte",
+        "src/lib/components/Sidebar.svelte",
+        "src/lib/components/Header.svelte",
+        "src/lib/components/ShoppingCart.svelte",
+        "src/lib/components/layout/UserMenu.svelte",
+        "src/app.css",
+        "src/app.html",
+        "src/lib/theme.ts"
+      ]
+    },
+    {
+      "name": "Internationalization",
+      "description": "i18n store and message catalogs supporting English and Indonesian.",
+      "files": [
+        "src/lib/stores/i18n.ts",
+        "messages/en.json",
+        "messages/id.json"
+      ]
+    },
+    {
+      "name": "UOM Service",
+      "description": "Units of Measurement (UOM) API client with CRUD operations and update endpoint.",
+      "files": [
+        "src/lib/services/uom.ts"
+      ]
+    },
+    {
+      "name": "Weather BMKG Service",
+      "description": "BMKG weather prediction API client for region-based forecast retrieval.",
+      "files": [
+        "src/lib/services/weatherBmkg.ts"
+      ]
+    },
+    {
+      "name": "Products UI",
+      "description": "Product form with image upload/preview, category selection, and optional recipe linkage.",
+      "files": [
+        "src/lib/components/forms/ProductForm.svelte"
+      ]
+    },
+    {
+      "name": "Orders Page",
+      "description": "Orders listing and item details view with operational actions.",
+      "files": [
+        "src/routes/(app)/orders/+page.svelte"
+      ]
+    },
+    {
+      "name": "Pages: Coming Soon",
+      "description": "Public page demonstrating countdown and simple email capture UI.",
+      "files": [
+        "src/routes/pages/coming-soon/+page.svelte"
+      ]
+    },
+    {
+      "name": "Build & Preview Config",
+      "description": "Tooling and configs for build/preview/testing and environment setup.",
+      "files": [
+        "vite.config.ts",
+        "playwright.config.ts",
+        "ENVIRONMENT_SETUP.md"
+      ]
+    },
+    {
+      "name": "Containerization & Orchestration",
+      "description": "Dockerfile and Podman compose setup for production deployment on port 5544.",
+      "files": [
+        "Dockerfile",
+        "compose.yml",
+        "PODMAN_README.md"
+      ]
+    }
+  ]
+}

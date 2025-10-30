@@ -1,0 +1,106 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT * FROM ingredient_stock_moves\n        WHERE uuid = $1 AND deleted_at = 0\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "uuid",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "ingredient_catalog_uuid",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 2,
+        "name": "quantity",
+        "type_info": "Numeric"
+      },
+      {
+        "ordinal": 3,
+        "name": "price",
+        "type_info": "Numeric"
+      },
+      {
+        "ordinal": 4,
+        "name": "price_updated_at",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 5,
+        "name": "effective_at",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 6,
+        "name": "expiry_at",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 7,
+        "name": "ref_type",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 8,
+        "name": "ref_uuid",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 9,
+        "name": "created_at",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 10,
+        "name": "updated_at",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 11,
+        "name": "deleted_at",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 12,
+        "name": "name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 13,
+        "name": "unit_of_measure_code",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 14,
+        "name": "unit_of_measure_name",
+        "type_info": "Varchar"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ]
+  },
+  "hash": "dcb59e5c8aa5ffa970151498115932ab342e5049e076fcba674d83a3b545c316"
+}

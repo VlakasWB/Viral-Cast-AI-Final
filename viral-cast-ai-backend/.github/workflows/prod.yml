@@ -1,0 +1,166 @@
+name: Build, Test and Deploy to Production
+
+on:
+  push:
+    branches:
+      - production
+
+env:
+  SQLX_OFFLINE: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo
+            target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-
+
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+
+      - name: Install SQLx CLI
+        run: |
+          cargo install sqlx-cli --no-default-features --features postgres
+
+      - name: Build and test code
+        run: |
+          cargo build --verbose
+          cargo test --verbose
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Set up environment variables for Docker
+        run: |
+          echo "APP_ENV=${{ secrets.APP_ENV_PROD }}" >> .env
+          echo "APP_PORT=${{ secrets.APP_PORT_PROD }}" >> .env
+          echo "CLIENT_ORIGIN=${{ secrets.CLIENT_ORIGIN }}" >> .env
+          echo "POSTGRES_SERVICE=${{ secrets.POSTGRES_SERVICE_PROD }}" >> .env
+          echo "POSTGRES_PORT=${{ secrets.POSTGRES_PORT_PROD }}" >> .env
+          echo "POSTGRES_DB=${{ secrets.POSTGRES_DB_PROD }}" >> .env
+          echo "POSTGRES_USER=${{ secrets.POSTGRES_USER_PROD }}" >> .env
+          echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD_PROD }}" >> .env
+          echo "REDIS_SERVICE=${{ secrets.REDIS_SERVICE_PROD }}" >> .env
+          echo "REDIS_PORT=${{ secrets.REDIS_PORT_PROD }}" >> .env
+          echo "REDIS_DB=${{ secrets.REDIS_DB_PROD }}" >> .env
+          echo "ACCESS_TOKEN_PRIVATE_KEY=${{ secrets.ACCESS_TOKEN_PRIVATE_KEY_PROD }}" >> .env
+          echo "ACCESS_TOKEN_PUBLIC_KEY=${{ secrets.ACCESS_TOKEN_PUBLIC_KEY_PROD }}" >> .env
+          echo "ACCESS_TOKEN_EXPIRED_IN=${{ secrets.ACCESS_TOKEN_EXPIRED_IN }}" >> .env
+          echo "ACCESS_TOKEN_MAXAGE=${{ secrets.ACCESS_TOKEN_MAXAGE }}" >> .env
+          echo "REFRESH_TOKEN_PRIVATE_KEY=${{ secrets.REFRESH_TOKEN_PRIVATE_KEY_PROD }}" >> .env
+          echo "REFRESH_TOKEN_PUBLIC_KEY=${{ secrets.REFRESH_TOKEN_PUBLIC_KEY_PROD }}" >> .env
+          echo "REFRESH_TOKEN_EXPIRED_IN=${{ secrets.REFRESH_TOKEN_EXPIRED_IN }}" >> .env
+          echo "REFRESH_TOKEN_MAXAGE=${{ secrets.REFRESH_TOKEN_MAXAGE }}" >> .env
+          echo "RUN_SEED=true" >> .env
+          echo "REGION_CSV_PATH=/app/data/regions.csv" >> .env
+          echo "RUN_BMKG_SEED=true" >> .env
+          echo "BMKG_CSV_PATH=/app/data/regions.csv" >> .env
+          echo "BMKG_PRIORITIES_CSV_PATH=/app/data/priorities.csv" >> .env
+          echo "RUN_GENERATE_PRIORITIES=false" >> .env
+
+      - name: Build and push Docker images
+        uses: docker/bake-action@v2.3.0
+        with:
+          files: docker-compose-prod.yml
+          push: true
+          set: |
+            *.cache-from=type=gha
+            *.cache-to=type=gha,mode=max
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Copy .env.example to .env
+        run: |
+          cp .env.example .env
+          echo ".env file created"
+
+      - name: Set up environment variables
+        run: |
+          echo "APP_ENV=${{ secrets.APP_ENV_PROD }}" >> .env
+          echo "APP_PORT=${{ secrets.APP_PORT_PROD }}" >> .env
+          echo "CLIENT_ORIGIN=${{ secrets.CLIENT_ORIGIN }}" >> .env
+          echo "PODMAN_DATABASE_URL=${{ secrets.PODMAN_DATABASE_URL_PROD }}" >> .env
+          echo "PODMAN_REDIS_URL=${{ secrets.PODMAN_REDIS_URL_PROD }}" >> .env
+          echo "POSTGRES_SERVICE=${{ secrets.POSTGRES_SERVICE_PROD }}" >> .env
+          echo "POSTGRES_PORT=${{ secrets.POSTGRES_PORT_PROD }}" >> .env
+          echo "POSTGRES_DB=${{ secrets.POSTGRES_DB_PROD }}" >> .env
+          echo "POSTGRES_USER=${{ secrets.POSTGRES_USER_PROD }}" >> .env
+          echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD_PROD }}" >> .env
+          echo "REDIS_SERVICE=${{ secrets.REDIS_SERVICE_PROD }}" >> .env
+          echo "REDIS_PORT=${{ secrets.REDIS_PORT_PROD }}" >> .env
+          echo "REDIS_DB=${{ secrets.REDIS_DB_PROD }}" >> .env
+          echo "ACCESS_TOKEN_PRIVATE_KEY=${{ secrets.ACCESS_TOKEN_PRIVATE_KEY_PROD }}" >> .env
+          echo "ACCESS_TOKEN_PUBLIC_KEY=${{ secrets.ACCESS_TOKEN_PUBLIC_KEY_PROD }}" >> .env
+          echo "ACCESS_TOKEN_EXPIRED_IN=${{ secrets.ACCESS_TOKEN_EXPIRED_IN }}" >> .env
+          echo "ACCESS_TOKEN_MAXAGE=${{ secrets.ACCESS_TOKEN_MAXAGE }}" >> .env
+          echo "REFRESH_TOKEN_PRIVATE_KEY=${{ secrets.REFRESH_TOKEN_PRIVATE_KEY_PROD }}" >> .env
+          echo "REFRESH_TOKEN_PUBLIC_KEY=${{ secrets.REFRESH_TOKEN_PUBLIC_KEY_PROD }}" >> .env
+          echo "REFRESH_TOKEN_EXPIRED_IN=${{ secrets.REFRESH_TOKEN_EXPIRED_IN }}" >> .env
+          echo "REFRESH_TOKEN_MAXAGE=${{ secrets.REFRESH_TOKEN_MAXAGE }}" >> .env
+          echo "RUN_SEED=true" >> .env
+          echo "REGION_CSV_PATH=/app/data/regions.csv" >> .env
+          echo "RUN_BMKG_SEED=true" >> .env
+          echo "BMKG_CSV_PATH=/app/data/regions.csv" >> .env
+          echo "BMKG_PRIORITIES_CSV_PATH=/app/data/priorities.csv" >> .env
+          echo "RUN_GENERATE_PRIORITIES=false" >> .env
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Install sshpass
+        run: sudo apt-get install sshpass
+
+      - name: Copy .env
+        run: sshpass -v -p ${{ secrets.CONTABO_PASSWORD }} scp -o StrictHostKeyChecking=no .env root@${{ vars.CONTABO_IP }}:~
+
+      - name: Copy docker-compose-prod.yml
+        run: sshpass -v -p ${{ secrets.CONTABO_PASSWORD }} scp -o StrictHostKeyChecking=no docker-compose-prod.yml root@${{ vars.CONTABO_IP }}:~
+
+      - name: List files in remote directory
+        run: sshpass -v -p ${{ secrets.CONTABO_PASSWORD }} ssh -o StrictHostKeyChecking=no root@${{ vars.CONTABO_IP }} "ls -a"
+
+      - name: Deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ vars.CONTABO_IP }}
+          username: root
+          password: ${{ secrets.CONTABO_PASSWORD }}
+          script: |
+            mkdir -p viral-cast-ai-backend-prod
+            mv .env viral-cast-ai-backend-prod/
+            mv docker-compose-prod.yml viral-cast-ai-backend-prod/
+            cd ~/viral-cast-ai-backend-prod
+            ls -a
+            podman compose -f docker-compose-prod.yml down
+            podman compose -f docker-compose-prod.yml pull
+            podman compose -f docker-compose-prod.yml up -d
+            rm -f .env
+            rm -f docker-compose-prod.yml

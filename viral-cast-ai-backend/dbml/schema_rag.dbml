@@ -1,0 +1,187 @@
+Project viral_cast_ai {
+  database_type: "PostgreSQL"
+}
+
+Table document_categories {
+  id uuid [pk]
+  name varchar(100) [not null, unique]
+  description text
+  color varchar(7) [not null, default: '#007bff']
+  icon varchar(50)
+  allowed_file_types text[] [default: '{}']
+  max_file_size_mb int [default: 50]
+  auto_tags text[] [default: '{}']
+  is_active boolean [default: true]
+  sort_order int [default: 0]
+  created_at timestamptz [default: NOW()]
+  updated_at timestamptz [default: NOW()]
+  deleted_at bigint [default: 0]
+}
+
+Table document_tags {
+  id uuid [pk]
+  name varchar(100) [not null, unique]
+  description text
+  color varchar(7)
+  usage_count bigint [default: 0]
+  created_at timestamptz [default: NOW()]
+  updated_at timestamptz [default: NOW()]
+  deleted_at bigint [default: 0]
+}
+
+Table rag_configurations {
+  id uuid [pk]
+  chunk_size int [not null, default: 1000]
+  chunk_overlap int [not null, default: 200]
+  embedding_model varchar(100) [not null, default: 'text-embedding-ada-002']
+  embedding_dimensions int [not null, default: 1536]
+  similarity_threshold real [not null, default: 0.7]
+  max_results int [not null, default: 10]
+  enable_reranking boolean [default: false]
+  reranking_model varchar(100)
+  supported_file_types text[] [default: ARRAY['pdf','txt','docx','md','csv']]
+  max_file_size_mb int [default: 50]
+  max_documents_per_user int [default: 100]
+  retention_days int [default: 365]
+  created_at timestamptz [default: NOW()]
+  updated_at timestamptz [default: NOW()]
+  deleted_at bigint [default: 0]
+}
+
+Table documents {
+  id uuid [pk]
+  title varchar(255) [not null]
+  description text
+  category varchar(100) [not null]
+  tags text[] [default: '{}']
+  file_path varchar(500) [not null]
+  file_name varchar(255) [not null]
+  file_size bigint [not null]
+  file_type varchar(10) [not null]
+  mime_type varchar(100) [not null]
+  status varchar(20) [not null, default: 'processing'] // processing, ready, error, deleted
+  error_message text
+  chunk_count int [default: 0]
+  processing_progress int [default: 0]
+  current_processing_step varchar(100)
+  uploaded_by uuid
+  access_count bigint [default: 0]
+  last_accessed timestamptz
+  created_at timestamptz [default: NOW()]
+  updated_at timestamptz [default: NOW()]
+  deleted_at bigint [default: 0]
+  indexes {
+    (category) [name: 'idx_documents_category']
+    (status) [name: 'idx_documents_status']
+    (uploaded_by) [name: 'idx_documents_uploaded_by']
+    (created_at) [name: 'idx_documents_created_at']
+    (tags) [name: 'idx_documents_tags']
+  }
+}
+
+Table document_chunks {
+  id uuid [pk]
+  document_id uuid [not null]
+  chunk_index int [not null]
+  content text [not null]
+  content_hash varchar(64) [not null]
+  embedding real[] [not null]
+  page_number int
+  start_char int
+  end_char int
+  metadata jsonb [default: '{}']
+  created_at timestamptz [default: NOW()]
+  indexes {
+    (document_id) [name: 'idx_document_chunks_document_id']
+    (content_hash) [name: 'idx_document_chunks_content_hash']
+    (document_id, chunk_index) [name: 'document_chunks_document_index_unique', unique]
+  }
+  Note: 'Use pgvector for embedding if available'
+}
+
+Table document_processing_jobs {
+  id uuid [pk]
+  document_id uuid [not null]
+  job_type varchar(50) [not null] // extract_text, generate_embeddings, reprocess
+  status varchar(20) [not null, default: 'pending'] // pending, processing, completed, failed
+  priority int [default: 5]
+  progress_percentage int [default: 0]
+  current_step varchar(100) [default: 'Initializing']
+  error_message text
+  retry_count int [default: 0]
+  max_retries int [default: 3]
+  started_at timestamptz
+  completed_at timestamptz
+  created_at timestamptz [default: NOW()]
+  updated_at timestamptz [default: NOW()]
+  deleted_at bigint [default: 0]
+  indexes {
+    (document_id) [name: 'idx_processing_jobs_document_id']
+    (status) [name: 'idx_processing_jobs_status']
+    (priority) [name: 'idx_processing_jobs_priority']
+    (created_at) [name: 'idx_processing_jobs_created_at']
+  }
+}
+
+Table document_access_logs {
+  id uuid [pk]
+  document_id uuid [not null]
+  user_id uuid
+  user_ip inet
+  query text [not null]
+  similarity_score real [not null]
+  response_time_ms bigint [not null]
+  chunks_retrieved int [not null]
+  accessed_at timestamptz [default: NOW()]
+  deleted_at bigint [default: 0]
+  indexes {
+    (document_id) [name: 'idx_access_logs_document_id']
+    (user_id) [name: 'idx_access_logs_user_id']
+    (accessed_at) [name: 'idx_access_logs_accessed_at']
+  }
+}
+
+Table rag_query_history {
+  id uuid [pk]
+  user_id uuid
+  user_ip inet
+  query text [not null]
+  query_hash varchar(64) [not null]
+  category_filter varchar(100)
+  document_ids_filter uuid[]
+  max_results int [not null]
+  similarity_threshold real [not null]
+  results_count int [not null]
+  top_similarity_score real
+  response_time_ms bigint [not null]
+  user_feedback varchar(20)
+  feedback_comment text
+  created_at timestamptz [default: NOW()]
+  deleted_at bigint [default: 0]
+  indexes {
+    (user_id) [name: 'idx_query_history_user_id']
+    (query_hash) [name: 'idx_query_history_query_hash']
+    (created_at) [name: 'idx_query_history_created_at']
+  }
+}
+
+Table document_similarity_cache {
+  id uuid [pk]
+  query_hash varchar(64) [not null, unique]
+  document_ids uuid[] [not null]
+  similarity_scores real[] [not null]
+  chunk_ids uuid[] [not null]
+  expires_at timestamptz [not null]
+  created_at timestamptz [default: NOW()]
+  deleted_at bigint [default: 0]
+  indexes {
+    (query_hash) [name: 'idx_similarity_cache_query_hash']
+    (expires_at) [name: 'idx_similarity_cache_expires_at']
+  }
+}
+
+// Relationships
+Ref: documents.category > document_categories.name
+Ref: document_chunks.document_id > documents.id
+Ref: document_processing_jobs.document_id > documents.id
+Ref: document_access_logs.document_id > documents.id

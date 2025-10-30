@@ -1,0 +1,28 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                    SELECT uom.code AS \"code?\", uom.name AS \"name?\"\n                    FROM ingredient_catalog ic\n                    LEFT JOIN units_of_measure uom ON ic.unit_of_measure_uuid = uom.uuid\n                    WHERE ic.uuid = $1\n                    ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "code?",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 1,
+        "name": "name?",
+        "type_info": "Varchar"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false
+    ]
+  },
+  "hash": "eb1077d901b3f210ffb1dc0c3b261074c4a7542a5cdc00308f140489aa2887b3"
+}

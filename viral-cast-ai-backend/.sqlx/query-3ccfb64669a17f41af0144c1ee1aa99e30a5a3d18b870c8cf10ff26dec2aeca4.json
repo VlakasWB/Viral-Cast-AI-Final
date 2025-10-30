@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "DELETE FROM recipe_items WHERE recipe_sets_uuid = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "3ccfb64669a17f41af0144c1ee1aa99e30a5a3d18b870c8cf10ff26dec2aeca4"
+}

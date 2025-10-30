@@ -1,0 +1,67 @@
+# ---- Step 1: Build deps with cargo-chef ----
+FROM rust:latest AS chef
+WORKDIR /app
+RUN cargo install cargo-chef
+
+# ---- Step 2: Plan ----
+FROM chef AS planner
+COPY . .
+RUN cargo chef prepare --recipe-path recipe.json
+
+# ---- Step 3: Cache dependencies ----
+FROM chef AS cacher
+COPY --from=planner /app/recipe.json recipe.json
+RUN cargo chef cook --release --recipe-path recipe.json
+
+# ---- Step 4: Build app (OFFLINE compile) ----
+FROM rust:latest AS builder
+WORKDIR /app
+COPY . .
+COPY --from=cacher /app/target target
+COPY --from=cacher /usr/local/cargo /usr/local/cargo
+
+# SQLx CLI (runtime migrations)
+RUN cargo install sqlx-cli
+
+# SQLX offline cache
+COPY .sqlx .sqlx
+ENV SQLX_OFFLINE=true
+
+# Build ALL binaries (server + seeder)
+RUN cargo build --release
+
+# ---- Step 5: Runtime ----
+FROM debian:bookworm-slim AS runtime
+WORKDIR /app
+
+RUN apt-get update && \
+    apt-get install -y ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
+
+# Binaries
+COPY --from=builder /app/target/release/viral_cast_ai_backend /usr/local/bin/viral_cast_ai_backend
+COPY --from=builder /app/target/release/seed_regions           /usr/local/bin/seed_regions
+COPY --from=builder /app/target/release/seed_bmkg_area         /usr/local/bin/seed_bmkg_area
+COPY --from=builder /app/target/release/seed_bmkg_area_from_csv /usr/local/bin/seed_bmkg_area_from_csv
+COPY --from=builder /app/target/release/generate_priorities_csv /usr/local/bin/generate_priorities_csv
+COPY --from=builder /app/target/release/seed_uoms              /usr/local/bin/seed_uoms
+COPY --from=builder /usr/local/cargo/bin/sqlx                  /usr/local/bin/sqlx
+
+
+# Migrations + data + entrypoint
+COPY --from=builder /app/migrations ./migrations
+COPY data ./data
+COPY scripts/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+ENV RUST_LOG=info
+ENV RUN_SEED=true
+ENV REGION_CSV_PATH=/app/data/regions.csv
+ENV RUN_BMKG_SEED=true
+ENV BMKG_CSV_PATH=/app/data/regions.csv
+ENV BMKG_PRIORITIES_CSV_PATH=/app/data/priorities.csv
+ENV RUN_GENERATE_PRIORITIES=true
+ENV RUN_UOMS_SEED=true
+
+EXPOSE 4000
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]

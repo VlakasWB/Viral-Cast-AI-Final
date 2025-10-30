@@ -1,0 +1,52 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT uuid, quantity, price, ref_type, unit_of_measure_code, unit_of_measure_name\n        FROM ingredient_stock_moves\n        WHERE ingredient_catalog_uuid = $1 AND deleted_at = 0\n        ORDER BY effective_at ASC, created_at ASC\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "uuid",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "quantity",
+        "type_info": "Numeric"
+      },
+      {
+        "ordinal": 2,
+        "name": "price",
+        "type_info": "Numeric"
+      },
+      {
+        "ordinal": 3,
+        "name": "ref_type",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "unit_of_measure_code",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "unit_of_measure_name",
+        "type_info": "Varchar"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      true,
+      true,
+      true
+    ]
+  },
+  "hash": "6c8e01d279356dd260cdbf4f2196dbeff7ae62f6baba11327a2091f8beec8640"
+}

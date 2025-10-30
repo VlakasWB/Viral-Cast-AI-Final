@@ -1,0 +1,392 @@
+@import 'tailwindcss';
+@plugin '@tailwindcss/forms';
+@plugin '@tailwindcss/typography';
+@import './lib/styles/themes.css';
+
+/* Variant dark (pakai data-mode pada <html>) */
+@custom-variant dark (&:is(html[data-mode="dark"] *));
+
+/* ===== Reset ringan & full-height ===== */
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+html,
+body {
+	height: 100%;
+	min-height: 100%;
+}
+#svelte,
+#__svelte__ {
+	min-height: 100%;
+}
+body {
+	background: transparent;
+}
+
+/* ===== Root (light default dengan nuansa orange) ===== */
+:root {
+	/* Typography & radius */
+	--font-sans:
+		'Poppins', 'Manrope', 'Urbanist', 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
+	--radius-card: 1.25rem;
+	--radius-pill: 9999px;
+
+	/* Surface & text dengan nuansa orange */
+	--color-surface: #fff8f3; /* Background dengan nuansa orange sangat ringan */
+	--color-text: #4b2b10; /* Teks gelap dengan nuansa orange */
+	--color-text: #000000; /* Teks hitam penuh untuk light mode */
+
+	/* Border & shadow dengan nuansa orange */
+	--ui-border: #fdba8c; /* Border disesuaikan ke warna sekunder */
+	--shadow-card: 0 2px 6px rgba(255, 62, 0, 0.07), 0 14px 40px -8px rgba(255, 62, 0, 0.1);
+	--shadow-header: 0 10px 25px -5px rgba(255, 62, 0, 0.14);
+	--shadow-sidebar: 0 10px 25px -5px rgba(255, 62, 0, 0.14);
+
+	/* Glass (opsional untuk komponen lama yang pakai .card-surface) */
+	--glass-border: rgba(255, 62, 0, 0.08);
+	--glass-shadow: 0 10px 30px rgba(255, 62, 0, 0.06);
+
+	/* Form & input styling dengan nuansa orange */
+	--input-bg: rgba(255, 250, 245, 0.8);
+	--input-border: rgba(255, 62, 0, 0.12);
+	--input-focus-border: var(--accent);
+	--input-focus-ring: rgba(255, 62, 0, 0.2);
+	--select-border-radius: 1.5rem;
+
+	/* Transitions */
+	--transition-fast: 150ms ease-out;
+	--transition-normal: 250ms ease-out;
+	--transition-slow: 350ms ease-out;
+
+	/* Background halaman (full) dengan nuansa orange */
+	--app-bg: linear-gradient(135deg, #fff8f3 0%, #fff2e8 100%);
+
+	/* Accent mengikuti orange Svelte */
+	--accent: var(--color-orange-svelte-600);
+
+	/* Nav active (ikut accent orange) */
+	--nav-active-bg: linear-gradient(180deg, rgba(255, 62, 0, 0.16), rgba(255, 62, 0, 0.08));
+	--nav-active-bg-solid: rgba(255, 62, 0, 0.12);
+	--nav-active-ring: rgba(255, 62, 0, 0.25);
+	--nav-active-text: var(--color-orange-svelte-600);
+}
+
+/* ===== Palet warna (OKLCH/HEX) ===== */
+:root {
+	/* Netral */
+	--color-gray-600: oklch(0.58 0 0);
+
+	/* Biru family */
+	--color-blue-600: oklch(0.65 0.15 248);
+	--color-blue-dark-600: oklch(0.45 0.18 248); /* Dark Blue / Biru Tua */
+	--color-sky-600: oklch(0.72 0.12 230);
+	--color-indigo-600: oklch(0.56 0.18 277);
+	--color-violet-600: oklch(0.58 0.18 295);
+
+	/* Ungu/pink/rose — dipisah jelas */
+	--color-rose-600: oklch(0.7 0.2 20); /* rose: kemerahan (hue~20) */
+	--color-pink-600: oklch(0.65 0.23 330); /* pink: magenta-ish */
+	--color-pink-deep-600: oklch(0.58 0.3 330); /* PINK PEKAT (baru) */
+
+	/* Merah (error) */
+	--color-red-600: oklch(0.6 0.26 29);
+
+	/* Oranye */
+	--color-orange-deep-600: #ef562f; /* samakan agar konsisten */
+
+	/* Amber/kuning/hijau */
+	--color-amber-600: oklch(0.82 0.15 80);
+	--color-yellow-600: oklch(0.88 0.14 95);
+	--color-yellow-deep-600: oklch(0.8 0.18 95); /* deep yellow */
+	--color-yellow-dark-600: #a16207; /* dark yellow */
+	--color-lime-600: oklch(0.78 0.18 128);
+	--color-green-600: #16a34a; /* success */
+	--color-emerald-600: #059669;
+	--color-teal-600: oklch(0.68 0.15 190);
+	--color-cyan-600: oklch(0.72 0.14 215);
+}
+
+/* ===== Dark mode ===== */
+html[data-mode='dark'] {
+	--color-surface: #1f2937; /* panel/header/sidebar/card ~ #2C2C2C */
+	--color-text: oklch(0.92 0 0);
+	--ui-border: #3a4657;
+	--app-bg: #111827;
+
+	--nav-active-bg: linear-gradient(
+		180deg,
+		oklch(from var(--accent) l c h / 0.22),
+	oklch(from var(--accent) l c h / 0.12)
+	);
+	--nav-active-bg-solid: oklch(from var(--accent) l c h / 0.18);
+	--nav-active-ring: oklch(from var(--accent) l c h / 0.35);
+
+	/* Dark mode form & input styling */
+	--input-bg: rgba(255, 255, 255, 0.1);
+	--input-border: oklch(0 0 0 / 0.2);
+	--glass-border: oklch(0 0 0 / 0.15);
+
+	/* Shadow dengan warna hitam untuk dark mode */
+	--shadow-card: 0 6px 16px rgba(0, 0, 0, 0.25), 0 36px 120px -18px rgba(0, 0, 0, 0.35);
+	--shadow-header: 0 10px 38px -14px rgba(0, 0, 0, 0.3);
+	--shadow-sidebar: 0 40px 140px -26px rgba(0, 0, 0, 0.4);
+	--glass-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+/* [REMOVED] Varian background light berbasis data-theme (ocean, emerald, rose) dihapus. */
+
+/* ===== Preset shadow ===== */
+:root[data-shadow='strong'] {
+	--shadow-card: 0 6px 16px oklch(0 0 0 / 0.1), 0 36px 120px -18px oklch(0 0 0 / 0.18);
+	--shadow-header: 0 10px 38px -14px oklch(0 0 0 / 0.18);
+	--shadow-sidebar: 0 40px 140px -26px oklch(0 0 0 / 0.22);
+}
+:root[data-shadow='off'] {
+	--shadow-card: none;
+	--shadow-header: none;
+	--shadow-sidebar: none;
+}
+
+/* ===== Util ===== */
+html {
+	font-family: var(--font-sans);
+	background: var(--app-bg);
+	color: var(--color-text);
+}
+
+.card-surface {
+	@apply rounded-[var(--radius-card)] border border-[--glass-border] p-4;
+	background: var(--color-surface);
+	box-shadow: var(--glass-shadow);
+}
+
+.shadow-card {
+	box-shadow: var(--shadow-card);
+}
+
+.shadow-header {
+	box-shadow: var(--shadow-header);
+}
+
+.shadow-sidebar {
+	box-shadow: var(--shadow-sidebar);
+}
+
+.nav-active-bg {
+	background: var(--nav-active-bg);
+}
+
+/* ===== Button text color fixes ===== */
+/* Ensure accent buttons have proper text contrast */
+.bg-\[--accent\] {
+	color: black !important;
+}
+
+html[data-mode='dark'] .bg-\[--accent\] {
+	color: white !important;
+}
+
+/* ===== Chat bubble text color fixes ===== */
+/* Fix text color for assistant chat bubbles */
+.bg-\[color-mix\(in_oklch\,var\(--accent\)\,white_85\%\)\] {
+	color: oklch(0.2 0 0) !important; /* dark text for light mode */
+}
+
+html[data-mode='dark'] .bg-\[color-mix\(in_oklch\,var\(--accent\)\,white_85\%\)\] {
+	color: oklch(0.1 0 0) !important; /* black text for dark mode */
+}
+
+/* ===== Input Styling ===== */
+.form-input {
+	@apply w-full rounded-xl border-2 px-4 py-3 text-sm font-medium transition-all duration-200;
+	@apply border-gray-200/60 bg-white/80 backdrop-blur-sm;
+	@apply text-gray-900 placeholder:text-gray-500;
+	@apply focus:border-[--accent] focus:bg-white focus:ring-4 focus:ring-[--accent]/20 focus:outline-none;
+	@apply hover:border-gray-300/80 hover:bg-white/90;
+	@apply disabled:cursor-not-allowed disabled:opacity-50;
+	box-shadow:
+		0 1px 3px rgba(0, 0, 0, 0.1),
+		0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+/* Table */
+.table-container {
+	@apply overflow-x-auto rounded-[var(--radius-card)] border-2 border-gray-200/60 bg-white/60 backdrop-blur-md dark:border-gray-600/60 dark:bg-white/10;
+	@apply shadow-sm;
+}
+
+/* Dark mode input styling */
+html[data-mode='dark'] .form-input {
+	@apply border-gray-600/60 bg-gray-800/80 text-gray-100 placeholder:text-gray-400;
+	@apply focus:border-[--accent] focus:bg-gray-800 focus:ring-[--accent]/20;
+	@apply hover:border-gray-500/80 hover:bg-gray-800/90;
+	box-shadow:
+		0 1px 3px rgba(0, 0, 0, 0.3),
+		0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* Search input specific styling */
+.form-input[type='search'] {
+	@apply pr-4; /* Normal right padding */
+}
+
+/* Search input with left icon */
+.form-input.pl-10 {
+	padding-left: 2.5rem; /* Space for left search icon */
+}
+
+.form-input[type='date']::-webkit-calendar-picker-indicator {
+	filter: none;
+}
+
+html[data-mode='dark'] .form-input[type='date']::-webkit-calendar-picker-indicator {
+	filter: invert(1) brightness(1.2);
+}
+
+/* Textarea styling */
+.form-textarea {
+	@apply form-input min-h-[100px] resize-y;
+}
+
+/* Select styling - Modern & Stylish */
+.form-select {
+	@apply form-input cursor-pointer;
+	background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor'%3e%3cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m19 9-7 7-7-7'/%3e%3c/svg%3e");
+	background-position: right 1rem center;
+	background-repeat: no-repeat;
+	background-size: 1.25em 1.25em;
+	padding-right: 3rem;
+	@apply border-gray-300/70 bg-gradient-to-b from-white/95 to-gray-50/95 shadow-sm;
+	@apply hover:border-[--accent]/50 hover:bg-gradient-to-b hover:from-white hover:to-gray-100;
+	@apply focus:border-[--accent] focus:bg-white focus:ring-2 focus:ring-[--accent]/30;
+	@apply transition-all duration-300 ease-out;
+	border-radius: 12px;
+	box-shadow:
+		0 2px 4px rgba(0, 0, 0, 0.05),
+		0 1px 2px rgba(0, 0, 0, 0.03),
+		inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+html[data-mode='dark'] .form-select {
+	background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23d1d5db'%3e%3cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m19 9-7 7-7-7'/%3e%3c/svg%3e");
+	@apply border-gray-600/60 bg-gradient-to-b from-gray-800/95 to-gray-900/95;
+	@apply hover:border-[--accent]/60 hover:bg-gradient-to-b hover:from-gray-800 hover:to-gray-900;
+	@apply focus:border-[--accent] focus:bg-gray-800 focus:ring-[--accent]/30;
+	box-shadow:
+		0 2px 4px rgba(0, 0, 0, 0.2),
+		0 1px 2px rgba(0, 0, 0, 0.15),
+		inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* Stylish select options */
+.form-select option {
+	@apply bg-white py-2 text-gray-900;
+}
+
+html[data-mode='dark'] .form-select option {
+	@apply bg-gray-800 text-gray-100;
+}
+
+/* Form group styling */
+.form-group {
+	@apply space-y-2;
+}
+
+.form-label {
+	@apply mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-300;
+}
+
+.form-error {
+	@apply mt-1 text-sm text-red-600 dark:text-red-400;
+}
+
+.form-help {
+	@apply mt-1 text-sm text-gray-600 dark:text-gray-400;
+}
+
+/* ===== Elegant Scrollbar Styles ===== */
+/* Modern scrollbar for webkit browsers */
+::-webkit-scrollbar {
+	width: 8px;
+	height: 8px;
+}
+
+::-webkit-scrollbar-track {
+	background: transparent;
+	border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+	background: color-mix(in oklch, var(--ui-border) 60%, transparent 40%);
+	border-radius: 4px;
+	transition: all 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+	background: color-mix(in oklch, var(--ui-border) 80%, transparent 20%);
+	transform: scale(1.1);
+}
+
+::-webkit-scrollbar-thumb:active {
+	background: var(--accent);
+}
+
+::-webkit-scrollbar-corner {
+	background: transparent;
+}
+
+/* Dark mode scrollbar adjustments */
+html[data-mode='dark'] ::-webkit-scrollbar-thumb {
+	background: color-mix(in oklch, var(--ui-border) 40%, transparent 60%);
+}
+
+html[data-mode='dark'] ::-webkit-scrollbar-thumb:hover {
+	background: color-mix(in oklch, var(--ui-border) 60%, transparent 40%);
+}
+
+/* Firefox scrollbar styling */
+* {
+	scrollbar-width: thin;
+	scrollbar-color: color-mix(in oklch, var(--ui-border) 60%, transparent 40%) transparent;
+}
+
+html[data-mode='dark'] * {
+	scrollbar-color: color-mix(in oklch, var(--ui-border) 40%, transparent 60%) transparent;
+}
+
+/* Smooth scrolling behavior */
+html {
+	scroll-behavior: smooth;
+}
+
+/* Custom scrollbar for specific containers */
+.elegant-scroll {
+	scrollbar-width: thin;
+	scrollbar-color: var(--accent) transparent;
+}
+
+.elegant-scroll::-webkit-scrollbar {
+	width: 6px;
+	height: 6px;
+}
+
+.elegant-scroll::-webkit-scrollbar-thumb {
+	background: linear-gradient(
+		45deg,
+		var(--accent),
+		color-mix(in oklch, var(--accent) 70%, transparent 30%)
+	);
+	border-radius: 3px;
+	box-shadow: 0 2px 4px oklch(0 0 0 / 0.1);
+}
+
+.elegant-scroll::-webkit-scrollbar-thumb:hover {
+	background: linear-gradient(
+		45deg,
+		var(--accent),
+		color-mix(in oklch, var(--accent) 80%, transparent 20%)
+	);
+	box-shadow: 0 4px 8px oklch(0 0 0 / 0.15);
+}

@@ -1,0 +1,112 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        UPDATE ingredient_stock_moves\n        SET name = $1,\n            ingredient_catalog_uuid = $2,\n            quantity = $3,\n            price = $4,\n            price_updated_at = $5,\n            effective_at = $6,\n            expiry_at = $7,\n            ref_type = $8,\n            ref_uuid = $9,\n            unit_of_measure_code = $10,\n            unit_of_measure_name = $11,\n            updated_at = $12\n        WHERE uuid = $13 AND deleted_at = 0\n        RETURNING uuid,\n                  name,\n                  ingredient_catalog_uuid,\n                  quantity,\n                  price,\n                  price_updated_at,\n                  effective_at,\n                  expiry_at,\n                  ref_type,\n                  ref_uuid,\n                  unit_of_measure_code,\n                  unit_of_measure_name,\n                  created_at,\n                  updated_at\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "uuid",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "ingredient_catalog_uuid",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 3,
+        "name": "quantity",
+        "type_info": "Numeric"
+      },
+      {
+        "ordinal": 4,
+        "name": "price",
+        "type_info": "Numeric"
+      },
+      {
+        "ordinal": 5,
+        "name": "price_updated_at",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 6,
+        "name": "effective_at",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 7,
+        "name": "expiry_at",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 8,
+        "name": "ref_type",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 9,
+        "name": "ref_uuid",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 10,
+        "name": "unit_of_measure_code",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 11,
+        "name": "unit_of_measure_name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 12,
+        "name": "created_at",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 13,
+        "name": "updated_at",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Varchar",
+        "Uuid",
+        "Numeric",
+        "Numeric",
+        "Int8",
+        "Int8",
+        "Int8",
+        "Varchar",
+        "Uuid",
+        "Varchar",
+        "Varchar",
+        "Int8",
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      true,
+      false,
+      false,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ]
+  },
+  "hash": "6dea01c8bfeb94a364ce7159e070a6da648eb144e6eab0136797fe7e947d6455"
+}

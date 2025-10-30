@@ -1,0 +1,20 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO products (\n                uuid,\n                category_uuid,\n                name,\n                sku,\n                price,\n                recipe_sets_uuid,\n                status,\n                image_url,\n                created_at,\n                updated_at,\n                deleted_at\n            )\n            VALUES ($1, $2, $3, $4, $5, NULL, 'ACTIVE', $6, $7, $7, 0)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Varchar",
+        "Varchar",
+        "Numeric",
+        "Varchar",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "06cddb3156c812605b6ed27eca37ed23bdc569f016c4da6eb2669b6388eb63a3"
+}

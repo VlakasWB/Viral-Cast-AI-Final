@@ -1,0 +1,16 @@
+export type ProviderKey =
+	| 'google'
+	| 'github'
+	| 'facebook'
+	| 'x'
+	| 'apple'
+	| 'microsoft'
+	| 'linkedin'
+	| 'gitlab'
+	| 'discord'
+	| 'slack'
+	| 'twitch'
+	| 'reddit'
+	| 'spotify'
+	| 'amazon'
+	| 'yahoo';

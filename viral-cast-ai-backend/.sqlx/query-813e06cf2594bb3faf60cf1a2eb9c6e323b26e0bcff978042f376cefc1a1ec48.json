@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT ingredient_catalog_uuid\n        FROM ingredient_stock_moves\n        WHERE uuid = $1 AND deleted_at = 0\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "ingredient_catalog_uuid",
+        "type_info": "Uuid"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "813e06cf2594bb3faf60cf1a2eb9c6e323b26e0bcff978042f376cefc1a1ec48"
+}

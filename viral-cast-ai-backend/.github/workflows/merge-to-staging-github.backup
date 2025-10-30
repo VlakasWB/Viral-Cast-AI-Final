@@ -1,0 +1,31 @@
+name: CI/CD
+
+on:
+  push:
+    branches:
+      - development
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Git
+        run: |
+          git config --global user.email "you@example.com"
+          git config --global user.name "Your Name"
+          git remote set-url origin https://vlakaswb:${{ secrets.ACCOUNT_GITHUB_TOKEN }}@github.com/viral-cast-ai/viral-cast-ai-be-rust.git
+
+      - name: Fetch staging branch
+        run: git fetch origin staging
+
+      - name: Checkout staging branch
+        run: git checkout staging
+
+      - name: Merge to staging with 'theirs' strategy
+        run: |
+          git merge --no-ff --no-edit --allow-unrelated-histories -X theirs development
+          git push origin staging

@@ -1,0 +1,176 @@
+version: "3.8"
+
+services:
+  vcai-postgres:
+    image: postgres:latest
+    container_name: vcai-postgres-container
+    hostname: vcai-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: "${POSTGRES_USER}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+      POSTGRES_DB: "${POSTGRES_DB}"
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    volumes:
+      - vcai-postgres-data:/var/lib/postgresql/data
+    networks:
+      - vcai-network
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB:-postgres} -h 127.0.0.1 -p 5432",
+        ]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  vcai-redis:
+    image: redis:alpine
+    container_name: vcai-redis-container
+    hostname: vcai-redis
+    ports:
+      - "${REDIS_PORT}:6379"
+    volumes:
+      - vcai-redis-data:/data
+    networks:
+      - vcai-network
+
+  vcai-etcd:
+    image: quay.io/coreos/etcd:v3.5.5
+    container_name: vcai-etcd-container
+    hostname: vcai-etcd
+    restart: always
+    command:
+      - etcd
+      - -name
+      - vcai-etcd
+      - -data-dir
+      - /etcd-data
+      - -listen-client-urls
+      - http://0.0.0.0:2379
+      - -advertise-client-urls
+      - http://vcai-etcd:2379
+      - -listen-peer-urls
+      - http://0.0.0.0:2380
+      - -initial-advertise-peer-urls
+      - http://vcai-etcd:2380
+      - -initial-cluster
+      - vcai-etcd=http://vcai-etcd:2380
+      - -initial-cluster-state
+      - new
+      - -initial-cluster-token
+      - etcd-cluster-1
+    ports:
+      - "2379:2379"
+      - "2380:2380"
+    volumes:
+      - vcai-etcd-data:/etcd-data
+    networks:
+      - vcai-network
+
+  vcai-minio:
+    image: minio/minio:latest
+    container_name: vcai-minio-container
+    hostname: vcai-minio
+    restart: always
+    environment:
+      MINIO_ROOT_USER: "${MINIO_ROOT_USER:-minioadmin}"
+      MINIO_ROOT_PASSWORD: "${MINIO_ROOT_PASSWORD:-miniostorage}"
+    command: server /data --console-address :9001
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - vcai-minio-data:/data
+    networks:
+      - vcai-network
+
+  vcai-pulsar:
+    image: apachepulsar/pulsar:2.10.2
+    container_name: vcai-pulsar-container
+    hostname: vcai-pulsar
+    restart: unless-stopped
+    command: ["bin/pulsar", "standalone"]
+    ports:
+      - "6650:6650"
+      - "8080:8080"
+    networks:
+      - vcai-network
+
+  vcai-milvus:
+    image: milvusdb/milvus:v2.4.0
+    container_name: vcai-milvus-container
+    hostname: vcai-milvus
+    restart: always
+    depends_on:
+      vcai-etcd:
+        condition: service_started
+      vcai-minio:
+        condition: service_started
+      vcai-pulsar:
+        condition: service_started
+    environment:
+      ETCD_ENDPOINTS: "vcai-etcd:2379"
+      MINIO_ADDRESS: "vcai-minio:9000"
+      MINIO_BUCKET_NAME: "milvus"
+      MINIO_ACCESS_KEY: "${MINIO_ROOT_USER:-minioadmin}"
+      MINIO_SECRET_KEY: "${MINIO_ROOT_PASSWORD:-miniostorage}"
+      PULSAR_ADDRESS: "pulsar://vcai-pulsar:6650"
+    command: ["milvus", "run", "standalone"]
+    ports:
+      - "19530:19530"
+    volumes:
+      - vcai-milvus-data:/var/lib/milvus
+    networks:
+      - vcai-network
+
+  vcai-app:
+    build:
+      context: .
+      dockerfile: Containerfile
+    image: vlakaswb/vcai-backend:v1.0.0
+    container_name: vcai-app-container
+    hostname: vcai-app-host
+    environment:
+      APP_ENV: "${APP_ENV}"
+      APP_PORT: "4000"
+      DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@vcai-postgres:5432/${POSTGRES_DB}?schema=public"
+      REDIS_URL: "redis://vcai-redis:6379/${REDIS_DB}"
+      CLIENT_ORIGIN: "${CLIENT_ORIGIN}"
+      ACCESS_TOKEN_PRIVATE_KEY: "${ACCESS_TOKEN_PRIVATE_KEY}"
+      ACCESS_TOKEN_PUBLIC_KEY: "${ACCESS_TOKEN_PUBLIC_KEY}"
+      ACCESS_TOKEN_EXPIRED_IN: "${ACCESS_TOKEN_EXPIRED_IN}"
+      ACCESS_TOKEN_MAXAGE: "${ACCESS_TOKEN_MAXAGE}"
+      REFRESH_TOKEN_PRIVATE_KEY: "${REFRESH_TOKEN_PRIVATE_KEY}"
+      REFRESH_TOKEN_PUBLIC_KEY: "${REFRESH_TOKEN_PUBLIC_KEY}"
+      REFRESH_TOKEN_EXPIRED_IN: "${REFRESH_TOKEN_EXPIRED_IN}"
+      REFRESH_TOKEN_MAXAGE: "${REFRESH_TOKEN_MAXAGE}"
+    depends_on:
+      vcai-postgres:
+        condition: service_healthy
+      vcai-redis:
+        condition: service_started
+    ports:
+      - "${APP_PORT}:4000"
+    networks:
+      - vcai-network
+    # Uses image default entrypoint (/usr/local/bin/entrypoint.sh)
+    # which runs migrations and seeds based on RUN_* env vars
+
+networks:
+  vcai-network:
+    driver: bridge
+
+volumes:
+  vcai-postgres-data:
+    driver: local
+  vcai-redis-data:
+    driver: local
+  vcai-etcd-data:
+    driver: local
+  vcai-minio-data:
+    driver: local
+  vcai-milvus-data:
+    driver: local

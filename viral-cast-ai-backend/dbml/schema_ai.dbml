@@ -1,0 +1,44 @@
+Project viral_cast_ai {
+  database_type: "PostgreSQL"
+}
+
+Table ai_config {
+  id uuid [pk]
+  input_validation_enabled boolean [not null, default: false]
+  token_limit_enabled boolean [not null, default: false]
+  max_input_length int [not null, default: 1000]
+  allowed_topics text[] [not null, default: '{}']
+  daily_token_limit int
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+  deleted_at bigint [default: 0]
+}
+
+Table token_usage {
+  id uuid [pk]
+  date date [not null, unique]
+  tokens_used int [not null, default: 0]
+  requests_count int [not null, default: 0]
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+  deleted_at bigint [default: 0]
+  indexes {
+    (date) [name: 'idx_token_usage_date']
+  }
+}
+
+Table ai_request_logs {
+  id uuid [pk]
+  prompt text [not null]
+  response text [not null]
+  tokens_used int [not null, default: 0]
+  model varchar(100) [not null]
+  success boolean [not null, default: true]
+  error_message text
+  created_at timestamptz [not null]
+  deleted_at bigint [default: 0]
+  indexes {
+    (created_at) [name: 'idx_ai_request_logs_created_at']
+    (success) [name: 'idx_ai_request_logs_success']
+  }
+}

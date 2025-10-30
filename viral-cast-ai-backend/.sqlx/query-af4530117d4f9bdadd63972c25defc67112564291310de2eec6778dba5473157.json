@@ -1,0 +1,17 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE recipe_sets\n               SET yield_quantity = 1,\n                   effective_from = $1,\n                   effective_to = $2,\n                   is_active = true,\n                   updated_at = $3\n               WHERE uuid = $4",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8",
+        "Int8",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "af4530117d4f9bdadd63972c25defc67112564291310de2eec6778dba5473157"
+}

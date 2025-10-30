@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE recipe_sets SET deleted_at = $1 WHERE uuid = $2 AND deleted_at = 0",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "ceb3ab9803520778c7304528eb7c18063b8c76fd3dd9da346a52099399c1a3c4"
+}

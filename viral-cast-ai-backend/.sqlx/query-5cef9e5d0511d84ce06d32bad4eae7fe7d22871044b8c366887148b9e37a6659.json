@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT shelf_life_days\n        FROM ingredient_catalog\n        WHERE uuid = $1 AND deleted_at = 0\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "shelf_life_days",
+        "type_info": "Int4"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      true
+    ]
+  },
+  "hash": "5cef9e5d0511d84ce06d32bad4eae7fe7d22871044b8c366887148b9e37a6659"
+}

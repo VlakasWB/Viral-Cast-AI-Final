@@ -1,0 +1,61 @@
+[package]
+name = "viral_cast_ai_backend"
+version = "0.1.0"
+edition = "2021"
+default-run = "viral_cast_ai_backend"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[features]
+default = []
+integration-tests = []
+
+[dependencies]
+axum = { version = "0.7.5", features = ["multipart"] }
+tokio = { version = "1.37.0", features = ["full"] }
+serde = { version = "1.0", features = ["derive"] }
+sqlx = { version = "0.7.4", features = ["runtime-tokio-rustls", "postgres", "time", "uuid", "chrono", "rust_decimal", "macros"] }
+dotenvy = "0.15"
+log = "0.4"
+pretty_env_logger = "0.5"
+async-trait = "0.1"
+thiserror = "1.0"
+axum-extra = { version = "0.9.3", features = ["cookie"] }
+time = "0.3.36"
+tower-http = { version = "0.5.2", features = ["cors", "fs", "trace", "limit"] }
+serde_json = "1.0.116"
+chrono = { version = "0.4.38", features = ["serde"] }
+chrono-tz = { version = "0.8", features = ["serde"] }
+uuid = { version = "1.8.0", features = ["serde", "v4"] }
+jsonwebtoken = "9.3.0"
+argon2 = "0.5.3"
+rand_core = { version = "0.6.4", features = ["std"] }
+base64 = "0.22.1"
+redis = { version = "0.25.3", features = ["tokio-comp"] }
+utoipa = { version = "4.2", features = ["axum_extras", "chrono", "uuid"] }
+utoipa-swagger-ui = { version = "6.0", features = ["axum"] }
+rust_decimal = { version = "1.35", features = ["serde"] }
+tokio-util = { version = "0.7", features = ["io"] }
+futures-util = "0.3"
+mime = "0.3"
+image = "0.24"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "fmt"] }
+tracing-appender = "0.2"
+reqwest = { version = "0.11", features = ["json", "multipart"] }
+sha2 = "0.10.9"
+validator = { version = "0.16", features = ["derive"] }
+regex = "1.10"
+csv = "1.3"
+anyhow = "1"
+milvus = "0.1"
+quick-xml = "0.31"
+zip = { version = "0.6", default-features = false, features = ["deflate"] }
+calamine = "0.21"
+# Added for PKCS#8 -> PKCS#1 RSA key conversion
+rsa = { version = "0.9", features = ["pem"] }
+rand = "0.8"
+
+[build-dependencies]
+dotenvy = "0.15"
+

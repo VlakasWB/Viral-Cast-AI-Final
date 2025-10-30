@@ -1,0 +1,17 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE recipe_items SET quantity = $1, waste_percent = $2, updated_at = $3 WHERE uuid = $4 AND deleted_at = 0",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Numeric",
+        "Numeric",
+        "Int8",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "b98364cd48bfc2743b7bd7d356c1fd852cdac74f870a78b54cb5a8402793f6c6"
+}

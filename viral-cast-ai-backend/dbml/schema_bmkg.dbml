@@ -1,0 +1,92 @@
+Project viral_cast_ai {
+  database_type: "PostgreSQL"
+}
+
+Table bmkg_area {
+  region_code text [pk]
+  adm1 text
+  adm2 text
+  adm3 text
+  adm4 text
+  provinsi text
+  kotkab text
+  kecamatan text
+  desa text
+  timezone text [not null]
+  lat double
+  lon double
+  created_at bigint
+  updated_at bigint
+  deleted_at bigint [default: 0]
+  indexes {
+    (region_code) [name: 'idx_bmkg_area_region_code_alive', note: 'WHERE deleted_at = 0']
+  }
+}
+
+Table bmkg_forecast_run {
+  region_code text [not null]
+  analysis_ms bigint [not null]
+  analysis_ts timestamptz
+  fetched_ms bigint
+  raw_json jsonb [not null]
+  source text [default: 'bmkg']
+  created_at bigint
+  updated_at bigint
+  deleted_at bigint [default: 0]
+  Note: 'PRIMARY KEY (region_code, analysis_ms); analysis_ts is GENERATED ALWAYS as to_timestamp(analysis_ms/1000.0)'
+  indexes {
+    (analysis_ms) [name: 'idx_bmkg_forecast_run_analysis_ms', note: 'DESC, WHERE deleted_at = 0']
+  }
+}
+
+Table bmkg_forecast {
+  region_code text [not null]
+  analysis_ms bigint [not null]
+  valid_ms bigint [not null]
+  analysis_ts timestamptz
+  valid_ts timestamptz
+  t real
+  hu real
+  weather_code smallint
+  weather_desc_id text
+  weather_desc_en text
+  ws real
+  wd text
+  wd_deg real
+  tcc real
+  vs_m real
+  tp_mm real
+  time_index text
+  image_url text
+  extras jsonb [not null, default: '{}']
+  created_at bigint
+  updated_at bigint
+  deleted_at bigint [default: 0]
+  Note: 'PRIMARY KEY (region_code, analysis_ms, valid_ms); analysis_ts/valid_ts are GENERATED ALWAYS'
+  indexes {
+    (region_code, valid_ms) [name: 'idx_bmkg_forecast_rc_valid_ms', note: 'WHERE deleted_at = 0']
+    (region_code, valid_ms, analysis_ms) [name: 'idx_bmkg_forecast_rc_valid_ms_latest', note: 'analysis_ms DESC, WHERE deleted_at = 0']
+    (valid_ts) [name: 'idx_bmkg_forecast_valid_ts', note: 'WHERE deleted_at = 0']
+    (extras) [name: 'idx_bmkg_forecast_extras_gin', note: 'USING GIN, WHERE deleted_at = 0']
+  }
+}
+
+Table bmkg_area_priority {
+  region_code text [pk]
+  priority int [not null, default: 100]
+  active boolean [not null, default: true]
+  last_hit_ms bigint
+  next_due_ms bigint
+  created_at bigint
+  updated_at bigint
+  deleted_at bigint [default: 0]
+  indexes {
+    (active) [name: 'idx_bmkg_area_priority_active', note: 'WHERE deleted_at = 0']
+    (priority) [name: 'idx_bmkg_area_priority_priority', note: 'WHERE deleted_at = 0']
+  }
+}
+
+// Relationships
+Ref: bmkg_forecast_run.region_code > bmkg_area.region_code
+Ref: bmkg_forecast_run.region_code, bmkg_forecast_run.analysis_ms > bmkg_forecast.region_code, bmkg_forecast.analysis_ms
+Ref: bmkg_area_priority.region_code > bmkg_area.region_code

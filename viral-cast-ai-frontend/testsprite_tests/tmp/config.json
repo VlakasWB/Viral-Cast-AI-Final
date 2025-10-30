@@ -1,0 +1,17 @@
+{
+  "status": "commited",
+  "type": "frontend",
+  "scope": "codebase",
+  "localEndpoint": "http://localhost:4173",
+  "loginUser": "admin_vcai_2",
+  "loginPassword": "admin",
+  "executionArgs": {
+    "projectName": "viral-cast-ai-frontend",
+    "projectPath": "d:\\DATA\\CODE\\TEMPLATES\\VIRAL CAST AI\\viral-cast-ai-frontend",
+    "testIds": [],
+    "additionalInstruction": "Gunakan kredensial login: username `admin_vcai_2`, password `admin`. Server produksi berjalan pada `http://localhost:4173`. Skenario E2E: 1) Buka halaman `/login`. 2) Isi form login dan submit. 3) Verifikasi API `POST /api/v1/auth/login` mengembalikan status 200 OK dan token. 4) Verifikasi redirect ke halaman utama (atau ke URL `from` bila ada). 5) Navigasi ke `/settings`. 6) Pastikan field awal tidak editable. 7) Klik tombol `Edit`. 8) Pastikan field menjadi editable. 9) Opsional: simpan perubahan dan verifikasi respons sukses. Simpan laporan uji di direktori default Testsprite dan tampilkan ringkasan hasil.",
+    "envs": {
+      "API_KEY": ""
+    }
+  }
+}

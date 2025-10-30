@@ -1,0 +1,203 @@
+// i18n / localization schema for ingredient catalog translations
+// This DBML defines per-locale translations for `ingredient_catalog`
+// Fallback policy: use requested locale if available; otherwise fall back to
+// the base `ingredient_catalog.name` (assumed canonical).
+
+Table ingredient_catalog_translations {
+  uuid uuid [pk, default: gen_random_uuid()]
+  ingredient_catalog_uuid uuid [not null, ref: > ingredient_catalog.uuid]
+  locale varchar(10) [not null] // e.g. 'id', 'en'
+  name varchar(100) [not null]
+  translation_status varchar(20) [default: 'human'] // 'human' | 'machine' | 'pending'
+  created_at bigint
+  updated_at bigint
+  deleted_at bigint [default: 0]
+
+  indexes {
+    (ingredient_catalog_uuid, locale) [name: 'uniq_ingredient_catalog_translations_locale', unique, note: 'Unique per catalog per locale WHERE deleted_at = 0']
+    (ingredient_catalog_uuid) [name: 'ingredient_catalog_translations_catalog_idx']
+    (locale) [name: 'ingredient_catalog_translations_locale_idx']
+  }
+
+  Note: "CHECK (translation_status IN ('human','machine','pending'))"
+  Note: "CHECK (locale IN ('id','en'))"
+  Note: 'Stores translations for ingredient_catalog.name per locale. Fallback to ingredient_catalog.name when missing.'
+}
+
+// Relationships
+Ref: ingredient_catalog_translations.ingredient_catalog_uuid > ingredient_catalog.uuid
+
+// ------------------------------------------------------------
+// Additional i18n tables for other user-facing entities
+// ------------------------------------------------------------
+
+// Products: translate name and description
+Table product_translations {
+  uuid uuid [pk, default: gen_random_uuid()]
+  product_uuid uuid [not null, ref: > products.uuid]
+  locale varchar(10) [not null] // 'id' | 'en'
+  name varchar(150) [not null]
+  description text
+  translation_status varchar(20) [default: 'human']
+  created_at bigint
+  updated_at bigint
+  deleted_at bigint [default: 0]
+
+  indexes {
+    (product_uuid, locale) [name: 'uniq_product_translations_locale', unique, note: 'Unique per product per locale WHERE deleted_at = 0']
+    (product_uuid) [name: 'product_translations_product_idx']
+    (locale) [name: 'product_translations_locale_idx']
+  }
+
+  Note: "CHECK (translation_status IN ('human','machine','pending'))"
+  Note: "CHECK (locale IN ('id','en'))"
+  Note: 'Stores translations for products.name and description per locale.'
+}
+
+Ref: product_translations.product_uuid > products.uuid
+
+// Categories: translate name
+Table category_translations {
+  uuid uuid [pk, default: gen_random_uuid()]
+  category_uuid uuid [not null, ref: > categories.uuid]
+  locale varchar(10) [not null] // 'id' | 'en'
+  name varchar(120) [not null]
+  translation_status varchar(20) [default: 'human']
+  created_at bigint
+  updated_at bigint
+  deleted_at bigint [default: 0]
+
+  indexes {
+    (category_uuid) [name: 'category_translations_category_idx']
+    (locale) [name: 'category_translations_locale_idx']
+  }
+
+  Note: "CHECK (translation_status IN ('human','machine','pending'))"
+  Note: "CHECK (locale IN ('id','en'))"
+  Note: 'Stores translations for categories.name per locale.'
+}
+
+Ref: category_translations.category_uuid > categories.uuid
+
+// Recipe sets: translate name and description
+Table recipe_set_translations {
+  uuid uuid [pk, default: gen_random_uuid()]
+  recipe_set_uuid uuid [not null, ref: > recipe_sets.uuid]
+  locale varchar(10) [not null] // 'id' | 'en'
+  name varchar(150) [not null]
+  description text
+  translation_status varchar(20) [default: 'human']
+  created_at bigint
+  updated_at bigint
+  deleted_at bigint [default: 0]
+
+  indexes {
+    (recipe_set_uuid, locale) [name: 'uniq_recipe_set_translations_locale', unique, note: 'Unique per recipe_set per locale WHERE deleted_at = 0']
+    (recipe_set_uuid) [name: 'recipe_set_translations_set_idx']
+    (locale) [name: 'recipe_set_translations_locale_idx']
+  }
+
+  Note: "CHECK (translation_status IN ('human','machine','pending'))"
+  Note: "CHECK (locale IN ('id','en'))"
+  Note: 'Stores translations for recipe_sets.name and description per locale.'
+}
+
+Ref: recipe_set_translations.recipe_set_uuid > recipe_sets.uuid
+
+// Recipe items: translate display fields
+Table recipe_item_translations {
+  uuid uuid [pk, default: gen_random_uuid()]
+  recipe_item_uuid uuid [not null, ref: > recipe_items.uuid]
+  locale varchar(10) [not null] // 'id' | 'en'
+  name varchar(150)
+  instructions text
+  notes text
+  translation_status varchar(20) [default: 'human']
+  created_at bigint
+  updated_at bigint
+  deleted_at bigint [default: 0]
+
+  indexes {
+    (recipe_item_uuid, locale) [name: 'uniq_recipe_item_translations_locale', unique, note: 'Unique per recipe_item per locale WHERE deleted_at = 0']
+    (recipe_item_uuid) [name: 'recipe_item_translations_item_idx']
+    (locale) [name: 'recipe_item_translations_locale_idx']
+  }
+
+  Note: "CHECK (translation_status IN ('human','machine','pending'))"
+  Note: "CHECK (locale IN ('id','en'))"
+  Note: 'Stores translations for recipe_items display fields per locale.'
+}
+
+Ref: recipe_item_translations.recipe_item_uuid > recipe_items.uuid
+
+// Ingredient stock moves: translate optional name
+Table ingredient_stock_move_translations {
+  uuid uuid [pk, default: gen_random_uuid()]
+  ingredient_stock_move_uuid uuid [not null, ref: > ingredient_stock_moves.uuid]
+  locale varchar(10) [not null] // 'id' | 'en'
+  name varchar(150)
+  translation_status varchar(20) [default: 'human']
+  created_at bigint
+  updated_at bigint
+  deleted_at bigint [default: 0]
+
+  indexes {
+    (ingredient_stock_move_uuid, locale) [name: 'uniq_ingredient_stock_move_translations_locale', unique, note: 'Unique per move per locale WHERE deleted_at = 0']
+    (ingredient_stock_move_uuid) [name: 'ingredient_stock_move_translations_move_idx']
+    (locale) [name: 'ingredient_stock_move_translations_locale_idx']
+  }
+
+  Note: "CHECK (translation_status IN ('human','machine','pending'))"
+  Note: "CHECK (locale IN ('id','en'))"
+  Note: 'Stores translations for ingredient_stock_moves.name per locale.'
+}
+
+Ref: ingredient_stock_move_translations.ingredient_stock_move_uuid > ingredient_stock_moves.uuid
+
+// Ingredient stocks: translate optional ingredient_name snapshot
+Table ingredient_stock_translations {
+  uuid uuid [pk, default: gen_random_uuid()]
+  ingredient_stock_uuid uuid [not null, ref: > ingredient_stocks.uuid]
+  locale varchar(10) [not null] // 'id' | 'en'
+  ingredient_name varchar(150)
+  translation_status varchar(20) [default: 'human']
+  created_at bigint
+  updated_at bigint
+  deleted_at bigint [default: 0]
+
+  indexes {
+    (ingredient_stock_uuid, locale) [name: 'uniq_ingredient_stock_translations_locale', unique, note: 'Unique per stock per locale WHERE deleted_at = 0']
+    (ingredient_stock_uuid) [name: 'ingredient_stock_translations_stock_idx']
+    (locale) [name: 'ingredient_stock_translations_locale_idx']
+  }
+
+  Note: "CHECK (translation_status IN ('human','machine','pending'))"
+  Note: "CHECK (locale IN ('id','en'))"
+  Note: 'Stores translations for ingredient_stocks.ingredient_name snapshot per locale.'
+}
+
+Ref: ingredient_stock_translations.ingredient_stock_uuid > ingredient_stocks.uuid
+
+// Ingredient market prices: translate optional name
+Table ingredient_market_price_translations {
+  uuid uuid [pk, default: gen_random_uuid()]
+  ingredient_market_price_uuid uuid [not null, ref: > ingredient_market_prices.uuid]
+  locale varchar(10) [not null] // 'id' | 'en'
+  name varchar(100)
+  translation_status varchar(20) [default: 'human']
+  created_at bigint
+  updated_at bigint
+  deleted_at bigint [default: 0]
+
+  indexes {
+    (ingredient_market_price_uuid, locale) [name: 'uniq_ingredient_market_price_translations_locale', unique, note: 'Unique per market price per locale WHERE deleted_at = 0']
+    (ingredient_market_price_uuid) [name: 'ingredient_market_price_translations_market_price_idx']
+    (locale) [name: 'ingredient_market_price_translations_locale_idx']
+  }
+
+  Note: "CHECK (translation_status IN ('human','machine','pending'))"
+  Note: "CHECK (locale IN ('id','en'))"
+  Note: 'Stores translations for ingredient_market_prices.name per locale.'
+}
+
+Ref: ingredient_market_price_translations.ingredient_market_price_uuid > ingredient_market_prices.uuid

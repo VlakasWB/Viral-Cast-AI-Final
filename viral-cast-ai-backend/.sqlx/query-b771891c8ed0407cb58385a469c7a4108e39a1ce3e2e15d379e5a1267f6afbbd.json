@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO categories (uuid, name, created_at, updated_at, deleted_at)\n            VALUES ($1, $2, $3, $3, 0)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Varchar",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "b771891c8ed0407cb58385a469c7a4108e39a1ce3e2e15d379e5a1267f6afbbd"
+}

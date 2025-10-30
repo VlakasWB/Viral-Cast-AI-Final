@@ -1,0 +1,4 @@
+-- Menghapus tabel ingredient_market_prices
+DROP INDEX IF EXISTS idx_ingredient_market_prices_effective_at;
+DROP INDEX IF EXISTS idx_ingredient_market_prices_ingredient_catalog_uuid;
+DROP TABLE IF EXISTS ingredient_market_prices;

@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO profiles (user_uuid)\n            VALUES ($1)\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "77d5c954a018c1e489a18e27a75863bdde9d84e2a287b49dfcfdb81a31ac9c67"
+}

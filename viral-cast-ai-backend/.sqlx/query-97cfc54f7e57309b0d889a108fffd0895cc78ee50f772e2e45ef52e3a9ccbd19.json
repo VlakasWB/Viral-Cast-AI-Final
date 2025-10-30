@@ -1,0 +1,94 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT \n            p.uuid, \n            p.category_uuid, \n            p.name, \n            p.sku, \n            p.price, \n            p.recipe_sets_uuid, \n            p.status, \n            p.image_url, \n            p.created_at, \n            p.updated_at, \n            p.deleted_at, \n            rs.name as \"recipe_name: Option<String>\", \n            rs.yield_quantity as \"recipe_yield_qty: Option<Decimal>\" \n        FROM products p \n        LEFT JOIN recipe_sets rs ON p.recipe_sets_uuid = rs.uuid AND rs.deleted_at = 0 \n        WHERE p.uuid = $1 AND p.deleted_at = 0",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "uuid",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "category_uuid",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 2,
+        "name": "name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "sku",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "price",
+        "type_info": "Numeric"
+      },
+      {
+        "ordinal": 5,
+        "name": "recipe_sets_uuid",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 6,
+        "name": "status",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 7,
+        "name": "image_url",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 8,
+        "name": "created_at",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 9,
+        "name": "updated_at",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 10,
+        "name": "deleted_at",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 11,
+        "name": "recipe_name: Option<String>",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 12,
+        "name": "recipe_yield_qty: Option<Decimal>",
+        "type_info": "Numeric"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true,
+      false,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      false,
+      true
+    ]
+  },
+  "hash": "97cfc54f7e57309b0d889a108fffd0895cc78ee50f772e2e45ef52e3a9ccbd19"
+}

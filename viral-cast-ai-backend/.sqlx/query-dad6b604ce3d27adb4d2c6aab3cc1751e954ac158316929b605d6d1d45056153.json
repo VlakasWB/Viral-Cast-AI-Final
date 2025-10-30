@@ -1,0 +1,49 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT \n            fd.method,\n            AVG(fd.mae) as avg_mae,\n            AVG(fd.mape) as avg_mape,\n            COUNT(*) as forecast_count,\n            (100.0 - AVG(fd.mape)) as accuracy_score\n        FROM forecast_daily fd\n        WHERE ($1::uuid IS NULL OR fd.product_uuid = $1)\n        AND ($2::text IS NULL OR fd.method = $2)\n        AND ($3::bigint IS NULL OR fd.date_ts >= $3)\n        AND ($4::bigint IS NULL OR fd.date_ts <= $4)\n        AND fd.deleted_at = 0\n        GROUP BY fd.method\n        ORDER BY accuracy_score DESC\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "method",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 1,
+        "name": "avg_mae",
+        "type_info": "Numeric"
+      },
+      {
+        "ordinal": 2,
+        "name": "avg_mape",
+        "type_info": "Numeric"
+      },
+      {
+        "ordinal": 3,
+        "name": "forecast_count",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 4,
+        "name": "accuracy_score",
+        "type_info": "Numeric"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text",
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      null,
+      null,
+      null,
+      null
+    ]
+  },
+  "hash": "dad6b604ce3d27adb4d2c6aab3cc1751e954ac158316929b605d6d1d45056153"
+}

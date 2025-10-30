@@ -1,0 +1,100 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT m.uuid,\n               m.name,\n               m.ingredient_catalog_uuid,\n               m.quantity,\n               m.price,\n               m.price_updated_at,\n               m.effective_at,\n               m.expiry_at,\n               m.ref_type,\n               m.ref_uuid,\n               m.created_at,\n               m.updated_at,\n               m.unit_of_measure_code AS \"unit_of_measure_code?\",\n               m.unit_of_measure_name AS \"unit_of_measure_name?\"\n        FROM ingredient_stock_moves m\n        WHERE m.uuid = $1 AND m.deleted_at = 0\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "uuid",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "ingredient_catalog_uuid",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 3,
+        "name": "quantity",
+        "type_info": "Numeric"
+      },
+      {
+        "ordinal": 4,
+        "name": "price",
+        "type_info": "Numeric"
+      },
+      {
+        "ordinal": 5,
+        "name": "price_updated_at",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 6,
+        "name": "effective_at",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 7,
+        "name": "expiry_at",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 8,
+        "name": "ref_type",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 9,
+        "name": "ref_uuid",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 10,
+        "name": "created_at",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 11,
+        "name": "updated_at",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 12,
+        "name": "unit_of_measure_code?",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 13,
+        "name": "unit_of_measure_name?",
+        "type_info": "Varchar"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      true,
+      false,
+      false,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ]
+  },
+  "hash": "a4602e1ce83798a37bb28714556e17c3222b82cf301b19268a3fb291973531da"
+}

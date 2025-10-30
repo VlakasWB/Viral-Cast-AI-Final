@@ -1,0 +1,54 @@
+Project viral_cast_ai_trend {
+  database_type: "PostgreSQL"
+  note: "Schema untuk agregasi berita tren F&B (Serper.dev)."
+}
+
+Table trend_news_sources {
+  id uuid [pk, default: "gen_uuid_v7()"]
+  code varchar(64) [not null, unique]
+  name text [not null]
+  source_type varchar(32) [not null, default: "'api'"]
+  base_url text
+  description text
+  is_active boolean [not null, default: true]
+  metadata jsonb
+  created_at bigint [default: "EXTRACT(EPOCH FROM NOW()) * 1000", note: "Timestamp dalam milidetik."]
+  updated_at bigint [default: "EXTRACT(EPOCH FROM NOW()) * 1000", note: "Timestamp dalam milidetik."]
+
+  indexes {
+    (code) [name: "trend_news_sources_code_key", unique]
+    is_active [name: "trend_news_sources_active_idx", note: "Partial index: hanya baris is_active = TRUE."]
+  }
+}
+
+Table trend_news_articles {
+  uuid uuid [pk, default: "gen_uuid_v7()"]
+  source_id uuid [not null, ref: > trend_news_sources.id]
+  source_article_id text
+  title text [not null]
+  description text
+  content text
+  summary text
+  image_url text
+  author text
+  published_at bigint
+  fetched_at bigint [not null, default: "EXTRACT(EPOCH FROM NOW()) * 1000", note: "Timestamp milidetik saat fetch."]
+  country varchar(4)
+  language varchar(8)
+  category text
+  keywords text[]
+  source_url text
+  raw_payload jsonb
+  created_at bigint [default: "EXTRACT(EPOCH FROM NOW()) * 1000"]
+  updated_at bigint [default: "EXTRACT(EPOCH FROM NOW()) * 1000"]
+  deleted_at bigint [default: 0]
+
+  indexes {
+    (source_id, source_article_id) [name: "trend_news_articles_source_article_idx", unique, note: "Unique ketika source_article_id tidak NULL."]
+    published_at [name: "trend_news_articles_published_idx"]
+    created_at [name: "trend_news_articles_created_idx"]
+    category [name: "trend_news_articles_category_idx", note: "Partial index: hanya baris dengan deleted_at = 0."]
+  }
+}
+
+Ref: trend_news_articles.source_id > trend_news_sources.id

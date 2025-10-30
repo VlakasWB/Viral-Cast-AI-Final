@@ -1,0 +1,94 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT\n            s.uuid,\n            s.ingredient_stock_moves_uuid,\n            m.ingredient_catalog_uuid,\n            ic.name as \"ingredient_name?\",\n            s.unit_of_measure_code as \"unit_of_measure_code?\",\n            s.unit_of_measure_name as \"unit_of_measure_name?\",\n            s.total_quantity,\n            s.total_value,\n            s.current_cost,\n            s.avg_cost,\n            s.created_at,\n            s.updated_at,\n            s.deleted_at\n        FROM ingredient_stocks s\n        JOIN ingredient_stock_moves m ON s.ingredient_stock_moves_uuid = m.uuid\n        LEFT JOIN ingredient_catalog ic ON m.ingredient_catalog_uuid = ic.uuid\n        WHERE s.uuid = $1\n        LIMIT 1\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "uuid",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "ingredient_stock_moves_uuid",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 2,
+        "name": "ingredient_catalog_uuid",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 3,
+        "name": "ingredient_name?",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "unit_of_measure_code?",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "unit_of_measure_name?",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "total_quantity",
+        "type_info": "Numeric"
+      },
+      {
+        "ordinal": 7,
+        "name": "total_value",
+        "type_info": "Numeric"
+      },
+      {
+        "ordinal": 8,
+        "name": "current_cost",
+        "type_info": "Numeric"
+      },
+      {
+        "ordinal": 9,
+        "name": "avg_cost",
+        "type_info": "Numeric"
+      },
+      {
+        "ordinal": 10,
+        "name": "created_at",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 11,
+        "name": "updated_at",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 12,
+        "name": "deleted_at",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      false,
+      false,
+      true,
+      true,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "2b4a07bc0e3ee8954b775a0dc30c33510ad17f34f2509dbcb288e9c7f0c9c03a"
+}

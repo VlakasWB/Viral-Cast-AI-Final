@@ -1,0 +1,18 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE products\n               SET category_uuid = $1,\n                   price = $2,\n                   image_url = $3,\n                   updated_at = $4,\n                   status = 'ACTIVE'\n               WHERE uuid = $5",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Numeric",
+        "Varchar",
+        "Int8",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "eb43944d9e842489f663b4948c6ebb63c7de2536705db50d1326e025c5f682cf"
+}

@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        UPDATE ingredient_stocks\n        SET ingredient_stock_moves_uuid = $1,\n            total_quantity = $2,\n            total_value = $3,\n            current_cost = $4,\n            avg_cost = $5,\n            unit_of_measure_code = $6,\n            unit_of_measure_name = $7,\n            updated_at = $8\n        WHERE uuid = $9\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Numeric",
+        "Numeric",
+        "Numeric",
+        "Numeric",
+        "Varchar",
+        "Varchar",
+        "Int8",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "a1666aa4e25c8daf2872bce90656dc526604d3673290d0c8448cbf48b8103e45"
+}
